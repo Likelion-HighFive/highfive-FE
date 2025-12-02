@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Header from "../../components/Header";
 import "./Login.css";
 
 import Logo from "../../assets/logo.png";
@@ -26,7 +25,6 @@ export default function Login() {
 
   return (
     <div className="login-screen">
-      <Header />
 
       <main className="login-body">
         <img src={Logo} alt="ALÉA 로고" className="login-logo" />
