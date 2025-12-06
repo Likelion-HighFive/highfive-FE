@@ -5,7 +5,7 @@ import styles from './HomePage.module.css';
 // 아이콘 및 이미지 임포트
 import areaLogo from '../../assets/images/logo/area_logo.svg';
 import searchIcon from '../../assets/icons/search.svg';
-import homeIcon from '../../assets/icons/home_icon.svg';
+import homeIcon from '../../assets/icons/home_crick_icon.svg';
 import backgroundIcon from '../../assets/icons/background_icon.svg';
 import likeIcon from '../../assets/icons/like_icon.svg';
 import myIcon from '../../assets/icons/my_icon.svg';
@@ -20,7 +20,13 @@ const HomePage = () => {
   // 탭 변경 핸들러
   const handleTabChange = (tabName) => {
     setActiveTab(tabName);
-    // 여기에 각 탭에 따른 라우팅 로직을 추가
+    // 각 탭에 따른 라우팅
+    if (tabName === 'background') {
+      navigate('/background');
+    } else if (tabName === 'home') {
+      navigate('/home');
+    }
+    // 다른 탭들에 대한 라우팅은 여기에 추가
   };
 
   // 검색 핸들러
@@ -80,7 +86,7 @@ const HomePage = () => {
           <button 
             key={category.id}
             className={`${styles.categoryButton} ${category.id === 'all' ? styles.active : ''}`}
-            onClick={() => navigate('/background-road')}
+            onClick={() => navigate('/background', { state: { selectedCategory: category.id } })}
           >
             {category.name}
           </button>
