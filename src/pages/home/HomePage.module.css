@@ -1,0 +1,212 @@
+.container {
+  width: 100%;
+  max-width: 393px;
+  height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: url('../../assets/images/background/home_image.svg') no-repeat center center;
+  background-size: cover;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.header {
+  padding: 25px 20px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  height: 24px;
+  width: auto;
+  flex-shrink: 0;
+  margin-top: -4px;
+}
+
+.searchContainer {
+  flex: 1;
+  position: relative;
+}
+
+.searchForm {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: 100%;
+  height: 40px;
+  padding: 0 44px 0 16px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.searchInput::placeholder {
+  color: #999;
+}
+
+.searchButton {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.searchButton img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Category Buttons */
+.categoryContainer {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px 16px;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.categoryContainer::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.categoryButton {
+  padding: 6px 16px;
+  border: 1px solid #E0E0E0;
+  border-radius: 20px;
+  background: #E9E9E9;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.categoryButton.active {
+  background: #7B61FF;
+  color: white;
+  border-color: #7B61FF;
+}
+
+.fabContainer {
+  position: fixed;
+  right: 20px;
+  bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 100;
+  align-items: flex-end;
+}
+
+.fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: none;
+  padding: 0;
+  position: relative;
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
+
+.fab.primary {
+  background-color: #7B61FF;
+}
+
+.fab.secondary {
+  height: 72px;
+  border-radius: 36px;
+  padding: 12px 0 8px;
+}
+
+.walkIcon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+.stepCount {
+  font-size: 10px;
+  color: #333;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.navBar {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 20px 20px 0 0;
+
+  z-index: 100;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.navItem.active {
+  color: #7B61FF;
+}
+
+.navIcon {
+
+  margin-bottom: 4px;
+}
+
+/* Content area */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px 24px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 72px; /* 하단 네비게이션을 위한 여백 */
+}
