@@ -1,0 +1,28 @@
+import React from 'react';
+import styles from './FloatingActionButtons.module.css';
+import plusButton from '../../assets/icons/plus_button.svg';
+import walkButton from '../../assets/icons/walk_button.svg';
+
+const FloatingActionButtons = ({ onAddPath, onShowSteps, stepCount = 0, isHome = false }) => {
+  return (
+    <div className={styles.fabContainer}>
+      <button className={`${styles.fab} ${styles.primary}`} onClick={onAddPath}>
+        <img src={plusButton} alt="경로 추가" />
+      </button>
+      <div className={styles.walkButtonContainer}>
+        <button 
+          className={`${styles.fab} ${styles.secondary}`} 
+          onClick={onShowSteps}
+        >
+          <img src={walkButton} alt="걸음수 보기" />
+        </button>
+        <div className={`${styles.stepCountContainer} ${isHome ? styles.homeStepCount : ''}`}>
+          <span className={styles.stepCountText}>걸음 수</span>
+          <span className={styles.stepCountNumber}>{stepCount}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default FloatingActionButtons;

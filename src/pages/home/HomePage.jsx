@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './HomePage.module.css';
 import MenuBar from '../../components/common/MenuBar';
+import FloatingActionButtons from '../../components/common/FloatingActionButtons';
 
 // 아이콘 및 이미지 임포트
 import areaLogo from '../../assets/images/logo/area_logo.svg';
@@ -21,7 +22,19 @@ const HomePage = () => {
   // 검색 핸들러
   const handleSearch = (e) => {
     e.preventDefault();
+    // 검색 로직 구현
     console.log('검색어:', searchQuery);
+  };
+
+  // 플로팅 액션 버튼 핸들러
+  const handleAddPath = () => {
+    // 경로 추가 로직
+    console.log('경로 추가하기');  
+  };
+
+  const handleShowSteps = () => {
+    // 걸음수 보기 로직
+    console.log('걸음수 보기');
   };
 
   // 카테고리 버튼 데이터
@@ -35,7 +48,7 @@ const HomePage = () => {
   ];
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} home`}>
       {/* 헤더 영역 */}
       <header className={styles.header}>
         <div className={styles.headerContent}>
@@ -79,15 +92,12 @@ const HomePage = () => {
       </main>
 
       {/* 플로팅 액션 버튼 */}
-      <div className={styles.fabContainer}>
-        <button className={`${styles.fab} ${styles.primary}`} onClick={() => console.log('경로 추가하기')}>
-          <img src={plusButton} alt="경로 추가" />
-        </button>
-        <button className={`${styles.fab} ${styles.secondary}`} onClick={() => console.log('걸음수 보기')}>
-          <img src={walkButton} alt="걸음수 보기" />
-          <span className={styles.stepCount}>0</span>
-        </button>
-      </div>
+      <FloatingActionButtons 
+        onAddPath={handleAddPath}
+        onShowSteps={handleShowSteps}
+        stepCount={0}
+        isHome={true}
+      />
 
       {/* 공통 메뉴 바 */}
       <MenuBar />

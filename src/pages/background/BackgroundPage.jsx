@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './BackgroundPage.module.css';
 import MenuBar from '../../components/common/MenuBar';
+import FloatingActionButtons from '../../components/common/FloatingActionButtons';
 
 // 아이콘 및 이미지 임포트
 import areaLogo from '../../assets/images/logo/area_logo.svg';
 import searchIcon from '../../assets/icons/search.svg';
 import heartIcon from '../../assets/icons/heart_icon.svg';
 import commentIcon from '../../assets/icons/comment_icon.svg';
-import plusButton from '../../assets/icons/plus_button.svg';
-import walkButton from '../../assets/icons/walk_button.svg';
 import nightCityBg from '../../assets/product/night city background.svg';
 
 const BackgroundPage = () => {
@@ -255,15 +254,11 @@ const BackgroundPage = () => {
       </div>
 
       {/* 플로팅 액션 버튼 */}
-      <div className={styles.fabContainer}>
-        <button className={`${styles.fab} ${styles.primary}`} onClick={handleAddPath}>
-          <img src={plusButton} alt="경로 추가" />
-        </button>
-        <button className={`${styles.fab} ${styles.secondary}`} onClick={handleShowSteps}>
-          <img src={walkButton} alt="걸음수 보기" />
-          <span className={styles.stepCount}>0</span>
-        </button>
-      </div>
+      <FloatingActionButtons 
+        onAddPath={handleAddPath}
+        onShowSteps={handleShowSteps}
+        stepCount={0}
+      />
 
       {/* 공통 메뉴 바 */}
       <MenuBar />
