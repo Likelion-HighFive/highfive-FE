@@ -27,14 +27,9 @@ const MyPage = () => {
     navigate('/edit-profile');
   };
 
-  const handleChangeImage = () => {
-    // 프로필 이미지 변경 로직
-    console.log('Change profile image');
-  };
-
-  const handleChangeNickname = () => {
-    // 닉네임 변경 로직
-    console.log('Change nickname');
+  const handleChangeName = () => {
+    // 이름 변경 페이지로 이동
+    navigate('/change-name');
   };
 
   const navigateToMemberInfo = () => {
@@ -73,11 +68,8 @@ const MyPage = () => {
         </section>
 
         <div className={styles.buttonGroup}>
-          <button className={styles.actionButton} onClick={handleChangeImage}>
-            프로필 이미지 변경
-          </button>
-          <button className={styles.actionButton} onClick={handleChangeNickname}>
-            닉네임 변경
+          <button className={styles.actionButton} onClick={handleChangeName}>
+            이름 변경
           </button>
         </div>
 

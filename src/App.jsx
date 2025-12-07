@@ -9,6 +9,7 @@ import LikesPage from './pages/likes/LikesPage';
 import MyPage from './pages/user/MyPage';
 import Signup from './pages/auth/Signup.jsx';
 import MyCarbonFootprint from './pages/footprint/MyCarbonFootprint';
+import ChangeNamePage from './pages/user/ChangeNamePage';
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
       <Route path="/likes" element={<LikesPage />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/footprint" element={<MyCarbonFootprint />} />
+      <Route path="/change-name" element={<ChangeNamePage />} />
     </Routes>
   );
 }

@@ -1,11 +1,13 @@
 .container {
-  max-width: 100%;
+  max-width: 430px; /* 모바일 화면 너비 제한 */
   margin: 0 auto;
   padding: 16px;
   padding-bottom: 80px; /* 메뉴바 공간 확보 */
   background-color: #ffffff;
   min-height: 100vh;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* 검색 바 스타일 */
