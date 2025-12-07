@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './HomePage.module.css';
+import MenuBar from '../../components/common/MenuBar';
 
 // 아이콘 및 이미지 임포트
 import areaLogo from '../../assets/images/logo/area_logo.svg';
 import searchIcon from '../../assets/icons/search.svg';
-import homeIcon from '../../assets/icons/home_crick_icon.svg';
+import homeIcon from '../../assets/icons/home_click_icon.svg';
 import backgroundIcon from '../../assets/icons/background_icon.svg';
 import likeIcon from '../../assets/icons/like_icon.svg';
 import myIcon from '../../assets/icons/my_icon.svg';
@@ -17,34 +18,10 @@ const HomePage = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // 탭 변경 핸들러
-  const handleTabChange = (tabName) => {
-    setActiveTab(tabName);
-    // 각 탭에 따른 라우팅
-    if (tabName === 'background') {
-      navigate('/background');
-    } else if (tabName === 'home') {
-      navigate('/home');
-    }
-    // 다른 탭들에 대한 라우팅은 여기에 추가
-  };
-
   // 검색 핸들러
   const handleSearch = (e) => {
     e.preventDefault();
-    // 검색 로직 구현
     console.log('검색어:', searchQuery);
-  };
-
-  // 플로팅 액션 버튼 핸들러
-  const handleAddPath = () => {
-    // 경로 추가 로직
-    console.log('경로 추가하기');  
-  };
-
-  const handleShowSteps = () => {
-    // 걸음수 보기 로직
-    console.log('걸음수 보기');
   };
 
   // 카테고리 버튼 데이터
@@ -103,46 +80,17 @@ const HomePage = () => {
 
       {/* 플로팅 액션 버튼 */}
       <div className={styles.fabContainer}>
-        <button className={`${styles.fab} ${styles.primary}`} onClick={handleAddPath}>
+        <button className={`${styles.fab} ${styles.primary}`} onClick={() => console.log('경로 추가하기')}>
           <img src={plusButton} alt="경로 추가" />
         </button>
-        <button className={`${styles.fab} ${styles.secondary}`} onClick={handleShowSteps}>
+        <button className={`${styles.fab} ${styles.secondary}`} onClick={() => console.log('걸음수 보기')}>
           <img src={walkButton} alt="걸음수 보기" />
           <span className={styles.stepCount}>0</span>
         </button>
       </div>
 
-      {/* 하단 네비게이션 바 */}
-      <nav className={styles.navBar}>
-        <button 
-          className={`${styles.navItem} ${activeTab === 'home' ? styles.active : ''}`}
-          onClick={() => handleTabChange('home')}
-        >
-          <img src={homeIcon} alt="홈" className={styles.navIcon} />
-          <span>홈</span>
-        </button>
-        <button 
-          className={`${styles.navItem} ${activeTab === 'background' ? styles.active : ''}`}
-          onClick={() => handleTabChange('background')}
-        >
-          <img src={backgroundIcon} alt="배경길" className={styles.navIcon} />
-          <span>배경길</span>
-        </button>
-        <button 
-          className={`${styles.navItem} ${activeTab === 'likes' ? styles.active : ''}`}
-          onClick={() => handleTabChange('likes')}
-        >
-          <img src={likeIcon} alt="좋아요" className={styles.navIcon} />
-          <span>좋아요</span>
-        </button>
-        <button 
-          className={`${styles.navItem} ${activeTab === 'my' ? styles.active : ''}`}
-          onClick={() => handleTabChange('my')}
-        >
-          <img src={myIcon} alt="마이페이지" className={styles.navIcon} />
-          <span>마이</span>
-        </button>
-      </nav>
+      {/* 공통 메뉴 바 */}
+      <MenuBar />
     </div>
   );
 };

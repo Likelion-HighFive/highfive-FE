@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './BackgroundPage.module.css';
+import MenuBar from '../../components/common/MenuBar';
 
 // 아이콘 및 이미지 임포트
 import areaLogo from '../../assets/images/logo/area_logo.svg';
 import searchIcon from '../../assets/icons/search.svg';
-import homeIcon from '../../assets/icons/home_icon.svg';
-import backgroundIcon from '../../assets/icons/background_crick_icon.svg';
-import likeIcon from '../../assets/icons/like_icon.svg';
-import myIcon from '../../assets/icons/my_icon.svg';
-import plusButton from '../../assets/icons/plus_button.svg';
-import walkButton from '../../assets/icons/walk_button.svg';
 import heartIcon from '../../assets/icons/heart_icon.svg';
 import commentIcon from '../../assets/icons/comment_icon.svg';
+import plusButton from '../../assets/icons/plus_button.svg';
+import walkButton from '../../assets/icons/walk_button.svg';
 import nightCityBg from '../../assets/product/night city background.svg';
 
 const BackgroundPage = () => {
@@ -25,7 +22,7 @@ const BackgroundPage = () => {
   const [sortBy, setSortBy] = useState('latest'); // 'latest', 'popular', 'distance'
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
-  // Toggle like status for a card
+  // 카드의 좋아요 상태를 전환합니다
   const toggleLike = (cardId) => {
     setLikedCards(prev => ({
       ...prev,
@@ -268,37 +265,8 @@ const BackgroundPage = () => {
         </button>
       </div>
 
-      {/* 하단 네비게이션 바 */}
-      <nav className={styles.navBar}>
-        <button 
-          className={`${styles.navItem} ${activeTab === 'home' ? styles.active : ''}`}
-          onClick={() => handleTabChange('home')}
-        >
-          <img src={homeIcon} alt="홈" className={styles.navIcon} />
-          <span>홈</span>
-        </button>
-        <button 
-          className={`${styles.navItem} ${activeTab === 'background' ? styles.active : ''}`}
-          onClick={() => setActiveTab('background')}
-        >
-          <img src={backgroundIcon} alt="배경길" className={styles.navIcon} />
-          <span>배경길</span>
-        </button>
-        <button 
-          className={`${styles.navItem} ${activeTab === 'likes' ? styles.active : ''}`}
-          onClick={() => setActiveTab('likes')}
-        >
-          <img src={likeIcon} alt="좋아요" className={styles.navIcon} />
-          <span>좋아요</span>
-        </button>
-        <button 
-          className={`${styles.navItem} ${activeTab === 'my' ? styles.active : ''}`}
-          onClick={() => setActiveTab('my')}
-        >
-          <img src={myIcon} alt="마이페이지" className={styles.navIcon} />
-          <span>마이</span>
-        </button>
-      </nav>
+      {/* 공통 메뉴 바 */}
+      <MenuBar />
     </div>
   );
 };
