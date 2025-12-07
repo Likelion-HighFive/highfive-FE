@@ -1,9 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './FloatingActionButtons.module.css';
 import plusButton from '../../assets/icons/plus_button.svg';
 import walkButton from '../../assets/icons/walk_button.svg';
 
-const FloatingActionButtons = ({ onAddPath, onShowSteps, stepCount = 0, isHome = false }) => {
+const FloatingActionButtons = ({ onAddPath, stepCount = 0, isHome = false }) => {
+  const navigate = useNavigate();
+  
+  const handleShowSteps = () => {
+    navigate('/footprint');
+  };
   return (
     <div className={styles.fabContainer}>
       <button className={`${styles.fab} ${styles.primary}`} onClick={onAddPath}>
@@ -12,7 +18,7 @@ const FloatingActionButtons = ({ onAddPath, onShowSteps, stepCount = 0, isHome =
       <div className={styles.walkButtonContainer}>
         <button 
           className={`${styles.fab} ${styles.secondary}`} 
-          onClick={onShowSteps}
+          onClick={handleShowSteps}
         >
           <img src={walkButton} alt="걸음수 보기" />
         </button>
