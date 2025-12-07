@@ -39,7 +39,7 @@ const MyPage = () => {
 
   const navigateToCarbonInfo = () => {
     // 탄소정보 페이지로 이동
-    navigate('/carbon-info');
+    navigate('/footprint');
   };
 
   return (
