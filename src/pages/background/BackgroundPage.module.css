@@ -376,57 +376,6 @@
   height: 16px;
 }
 
-/* 플로팅 액션 버튼 */
-.fabContainer {
-  position: fixed;
-  right: 1.5rem;
-  bottom: 6rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  z-index: 10;
-}
-
-.fab {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.fab:active {
-  transform: scale(0.95);
-}
-
-.fab.primary {
-  background-color: #212529;
-}
-
-.fab.secondary {
-  background-color: white;
-  position: relative;
-}
-
-.stepCount {
-  position: absolute;
-  bottom: -5px;
-  right: -5px;
-  background-color: #ff4d4f;
-  color: white;
-  font-size: 0.75rem;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 /* 하단 네비게이션 바 */
 .navBar {

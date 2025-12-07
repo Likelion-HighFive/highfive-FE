@@ -7,6 +7,7 @@ import HomePage from './pages/home/HomePage';
 import BackgroundPage from './pages/background/BackgroundPage';
 import MyPage from './pages/user/MyPage';
 import Signup from './pages/auth/Signup.jsx';
+import MyCarbonFootprint from './pages/footprint/MyCarbonFootprint';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
       <Route path="/background" element={<BackgroundPage />} />
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/footprint" element={<MyCarbonFootprint />} />
     </Routes>
   );
 }

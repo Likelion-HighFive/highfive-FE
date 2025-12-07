@@ -112,59 +112,6 @@
   border-color: #7B61FF;
 }
 
-.fabContainer {
-  position: fixed;
-  right: 20px;
-  bottom: 100px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  z-index: 100;
-  align-items: flex-end;
-}
-
-.fab {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  transition: transform 0.2s;
-  border: none;
-  padding: 0;
-  position: relative;
-}
-
-.fab:active {
-  transform: scale(0.95);
-}
-
-.fab.primary {
-  background-color: #7B61FF;
-}
-
-.fab.secondary {
-  height: 72px;
-  border-radius: 36px;
-  padding: 12px 0 8px;
-}
-
-.walkIcon {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 4px;
-}
-
-.stepCount {
-  font-size: 10px;
-  color: #333;
-  font-weight: 600;
-  line-height: 1.2;
-}
 
 .navBar {
   bottom: 0;
