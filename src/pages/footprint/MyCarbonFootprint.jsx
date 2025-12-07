@@ -11,7 +11,7 @@ const MyCarbonFootprint = () => {
   };
 
   const handleEnd = () => {
-    navigate('/home');
+    navigate(-1); // 이전 페이지로 이동
   };
 
   return (
