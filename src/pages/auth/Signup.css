@@ -1,0 +1,155 @@
+:root {
+    --purple-main: #7b2ce0;
+    --gray-border: #e1e1e1;
+    --gray-bg: #fafafa;
+    --text-main: #111111;
+    --text-sub: #9e9ea7;
+  }
+  
+  /* 전체 화면 */
+  .signup-screen {
+    width: 393px;
+    height: 100vh;
+    margin: 0 auto;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+      "Noto Sans KR", sans-serif;
+  }
+  
+  .signup-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 24px 24px;
+  }
+  
+  /* 로고 */
+  .signup-logo {
+    width: 140px;
+    height: auto;
+    display: block;
+    margin: 0 auto 56px;
+  }
+  
+  /* 폼 */
+  .signup-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* 필드 그룹 간 간격 */
+  .signup-field-group + .signup-field-group {
+    margin-top: 18px;
+  }
+  
+  /* 라벨 */
+  .signup-field-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    margin-left: 8px;
+    display: flex;
+  }
+  
+  /* 인풋 래퍼 */
+  .signup-field-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 56px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1px solid var(--gray-border);
+    background-color: #ffffff;
+  }
+  
+  /* 내용 있을 때 / 포커스 되었을 때 */
+  .signup-field-input-wrap.filled,
+  .signup-field-input-wrap:focus-within {
+    border-color: #b24dff;
+    background-color: #f2e4ff;
+    box-shadow: 0 0 0 1px rgba(130, 0, 195, 0.2);
+  }
+  
+  /* 아이콘 */
+  .signup-field-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+  
+  /* 인풋 */
+  .signup-field-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    color: var(--text-main);
+  }
+  
+  .signup-field-input::placeholder {
+    color: var(--text-sub);
+  }
+  
+  /* 오른쪽 아이콘 버튼(눈 아이콘) */
+  .signup-field-right-btn {
+    border: none;
+    outline: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  .signup-field-right-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+  
+  /* 비밀번호 안내 문구 */
+  .signup-hint {
+    margin-top: 8px;
+    margin-left: 8px;
+    font-size: 12px;
+    color: var(--text-sub);
+  }
+  
+  /* 회원가입 버튼 */
+  .signup-button {
+    margin-top: 60px;
+    height: 56px;
+    border: none;
+    border-radius: 16px;
+    background-color: #8200c3;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: -0.45px;
+  }
+  
+  .signup-button:active {
+    opacity: 0.9;
+  }
+  
+  /* 하단 영역 */
+  .signup-footer {
+    margin-top: auto;
+    padding-top: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* 홈 인디케이터 */
+  .signup-home-indicator {
+    width: 100px;
+    height: 4px;
+    border-radius: 999px;
+    background-color: #000000;
+  }
+  
