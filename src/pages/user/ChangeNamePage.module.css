@@ -1,0 +1,168 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 헤더 스타일 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: white;
+  position: relative;
+  z-index: 10;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  flex: 1;
+  letter-spacing: -0.3px;
+}
+
+.homeButton {
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: absolute;
+  right: 16px;
+}
+
+.homeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* 본문 스타일 */
+.content {
+  flex: 1;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.changeCount {
+  color: #666;
+  font-size: 13px;
+  margin: 0 0 20px 0;
+  text-align: right;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.inputGroup {
+  background-color: white;
+  padding: 28px 24px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.inputGroup:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.nameInput {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 15px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.nameInput:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+  background-color: white;
+}
+
+.nameInput::placeholder {
+  color: #adb5bd;
+  font-weight: 400;
+}
+
+.currentName {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+  padding: 8px 4px;
+  font-weight: 500;
+}
+
+/* 버튼 컨테이너 스타일 */
+.buttonContainer {
+  margin-top: auto;
+  padding: 8px 0 24px;
+  width: 100%;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+  letter-spacing: -0.3px;
+}
+
+.submitButton:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.3);
+}
+
+.submitButton:active {
+  transform: translateY(0);
+}
+
+.submitButton:disabled {
+  background: #dee2e6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.inputGroup, .buttonContainer {
+  animation: fadeIn 0.4s ease-out forwards;
+}

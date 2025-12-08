@@ -1,0 +1,240 @@
+.container {
+  max-width: 430px; /* 모바일 화면 너비 제한 */
+  margin: 0 auto;
+  padding: 16px;
+  padding-bottom: 80px; /* 메뉴바 공간 확보 */
+  background-color: #ffffff;
+  min-height: 100vh;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 검색 바 스타일 */
+.searchBar {
+  position: relative;
+  margin: 0 0 24px 0;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 14px 48px 14px 20px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #333;
+  outline: none;
+  background-color: white;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  border-color: #8A2BE2;
+  box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.1);
+}
+
+.searchIcon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+}
+
+/* 카테고리 필터 스타일 */
+.categoryContainer {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 8px 0;
+  margin-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+.categoryContainer::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.categoryButton {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  background-color: #ffffff;
+  font-size: 14px;
+  color: #666666;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.activeCategory {
+  background-color: #8A2BE2;
+  color: white;
+  border-color: #8A2BE2;
+}
+
+/* 정렬 옵션 스타일 */
+.sortContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.sortDropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: #666666;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.dropdownArrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-width: 120px;
+  overflow: hidden;
+}
+
+.dropdownMenu div {
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdownMenu div:hover {
+  background-color: #f5f5f5;
+}
+
+/* 경로 카드 그리드 */
+.pathsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 80px; /* 플로팅 버튼과의 간격 */
+}
+
+.pathCard {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pathCard:active {
+  transform: scale(0.98);
+}
+
+.pathImage {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  background-color: #f0f0f0;
+  overflow: hidden;
+}
+
+.pathImagePlaceholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+}
+
+.likeButton {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+
+.pathInfo {
+  padding: 12px;
+}
+
+.pathInfo h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pathDescription {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #666666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pathTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.tag {
+  font-size: 10px;
+  color: #8A2BE2;
+  background-color: #F0E6FF;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.pathStats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: #999999;
+}
+
+.pathStats span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pathStats img {
+  width: 14px;
+  height: 14px;
+}
