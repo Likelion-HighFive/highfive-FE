@@ -1,0 +1,164 @@
+.nav-start-screen {
+    width: 100%;
+    max-width: 393px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    font-family: system-ui, -apple-system, "Noto Sans KR", sans-serif;
+  }
+  
+  /* 상단 지도 자리 */
+  .nav-map-placeholder {
+    width: 100%;
+    height: 350px; /* 이미지 예시와 비슷한 높이 */
+    background-color: #f2f2f2;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+  }
+  
+  /* 아래 보라색 영역 */
+  .nav-info-section {
+    flex: 1;
+    background: #8200C3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50px;
+    color: #ffffff;
+    position: relative;
+  }
+
+  .nav-start-screen {
+    width: 100%;
+    max-width: 393px;
+    margin: 0 auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    overflow: hidden;
+  }
+  
+  /* 지도 placeholder */
+  .nav-map-placeholder {
+    width: 100%;
+    height: 350px;
+    background: #f2f2f2;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+  }
+  
+  /* 보라색 영역 */
+  .nav-info-section {
+    position: relative;
+    flex: 1;
+    background: #7B2CE0;
+    padding-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+    overflow: hidden;
+  }
+  
+  /* 발자국 이미지 공통 */
+  .foot-img {
+    position: absolute;
+    opacity: 0.18; /* 완전 진하게 보이면 어색하니까 은은하게 */
+    width: 120px;  /* 필요하면 조절 가능 */
+    pointer-events: none;
+  }
+  
+  /* 발자국 1 */
+  .foot1 {
+    right: 40px;
+    top: 80px;
+    transform: rotate(15deg);
+  }
+  
+  /* 발자국 2 */
+  .foot2 {
+    right: 20px;
+    top: 160px;
+    transform: rotate(30deg);
+  }
+  
+  /* 발자국 3 */
+  .foot3 {
+    right: 80px;
+    top: 230px;
+    transform: rotate(-10deg);
+  }
+  
+  /* 타이포 & 버튼 */
+  .nav-current-step {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  
+  .nav-label {
+    opacity: 0.9;
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .nav-total-steps {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-bottom: 48px;
+  }
+  
+  .nav-stop-button {
+    width: 85%;
+    height: 52px;
+    background: #000;
+    color: #fff;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  
+  /* 걸음 수 */
+  .nav-current-step {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  
+  .nav-label {
+    font-size: 16px;
+    opacity: 0.9;
+    margin-bottom: 16px;
+  }
+  
+  .nav-total-steps {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-bottom: 48px;
+  }
+  
+  /* 종료 버튼 */
+  .nav-stop-button {
+    width: 85%;
+    height: 52px;
+    background: #000000;
+    color: #ffffff;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 500;
+    margin-top: 30px;
+    cursor: pointer;
+
+  }
+  
+  .nav-stop-button:active {
+    opacity: 0.85;
+  }
+  
