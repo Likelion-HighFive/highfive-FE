@@ -12,6 +12,8 @@ import NavigationStart from "./pages/theme/NavigationStart.jsx";
 import MyCarbonFootprint from './pages/footprint/MyCarbonFootprint';
 import ChangeNamePage from './pages/user/ChangeNamePage';
 import CreatePathPage from './pages/paths/CreatePathPage';
+import Complete from './pages/theme/Complete.jsx';
+
 
 export default function App() {
   return (
@@ -26,6 +28,7 @@ export default function App() {
       <Route path="/footprint" element={<MyCarbonFootprint />} />
       <Route path="/change-name" element={<ChangeNamePage />} />
       <Route path="/create-path" element={<CreatePathPage />} />
+      <Route path="/complete" element={<Complete />} />
     </Routes>
   );
 }

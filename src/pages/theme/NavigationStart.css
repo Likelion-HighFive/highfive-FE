@@ -1,6 +1,6 @@
 .nav-start-screen {
     width: 100%;
-    max-width: 393px;
+    max-width: 430px;
     margin: 0 auto;
     height: 100%;
     display: flex;
@@ -12,13 +12,13 @@
   /* 상단 지도 자리 */
   .nav-map-placeholder {
     width: 100%;
-    height: 350px; /* 이미지 예시와 비슷한 높이 */
+    height: 350px; 
     background-color: #f2f2f2;
     border-bottom-left-radius: 24px;
     border-bottom-right-radius: 24px;
   }
   
-  /* 아래 보라색 영역 */
+  /* 아래 영역 */
   .nav-info-section {
     flex: 1;
     background: #8200C3;
@@ -66,8 +66,8 @@
   /* 발자국 이미지 공통 */
   .foot-img {
     position: absolute;
-    opacity: 0.18; /* 완전 진하게 보이면 어색하니까 은은하게 */
-    width: 120px;  /* 필요하면 조절 가능 */
+    opacity: 0.18; 
+    width: 120px;
     pointer-events: none;
   }
   
