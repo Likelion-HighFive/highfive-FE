@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
 import Logo from "../../assets/logo.png";
@@ -7,20 +8,66 @@ import PasswordIcon from "../../assets/password.png";
 import ShowIcon from "../../assets/show.png";
 import HideIcon from "../../assets/hide.png";
 
+import { login } from "../../api/auth";
+
 export default function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberId, setRememberId] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const hasEmail = email.trim().length > 0;
   const hasPassword = password.trim().length > 0;
 
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberEmail");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberId(true);
+    }
+  }, []);
 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // 여기서 API 연결해서 로그인 처리하기
-    console.log({ email, password, rememberId });
+    setErrorMsg("");
+    setLoading(true);
+
+    try {
+      const res = await login({ email, password });
+
+
+      if (!res.isSuccess) {
+        throw new Error(res.message || "로그인에 실패했습니다.");
+      }
+
+      const accessToken = res.data?.access_token;
+      const tokenType = res.data?.token_type;
+
+      if (accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+      }
+      if (tokenType) {
+        localStorage.setItem("tokenType", tokenType);
+      }
+
+      if (rememberId) {
+        localStorage.setItem("rememberEmail", email);
+      } else {
+        localStorage.removeItem("rememberEmail");
+      }
+
+      navigate("/home");
+    } catch (error) {
+      console.error("로그인 오류:", error);
+      setErrorMsg(error.message || "로그인 중 문제가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -88,21 +135,30 @@ export default function Login() {
             </span>
             <span className="remember-label">아이디 저장</span>
           </button>
+          {errorMsg && (
+            <p className="login-error-message">{errorMsg}</p>
+          )}
 
 
-          <button type="submit" className="login-button">
-            로그인
+<button
+            type="submit"
+            className="login-button"
+            disabled={loading}
+          >
+            {loading ? "로그인 중..." : "로그인"}
           </button>
         </form>
 
 
         <div className="login-footer">
-          <button type="button" className="signup-link">
-            계정이 없으신가요?
-          </button>
-
-          <div className="home-indicator" />
-        </div>
+  <button
+    type="button"
+    className="signup-link"
+    onClick={() => navigate("/signup")}
+  >
+    계정이 없으신가요?
+  </button>
+</div>
       </main>
     </div>
   );
