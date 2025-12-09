@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Detail.css";
 
 import MenuBar from "../../components/common/MenuBar";
@@ -6,8 +6,13 @@ import FloatingActionButtons from "../../components/common/FloatingActionButtons
 
 import topImage from "../../assets/detail_top.svg"; 
 import thumbImage from "../../assets/detail_thumb.svg"; 
+import HeartDefault from "../../assets/Heart.svg";
+import HeartFilled from "../../assets/HeartFilled.png";
+
 
 export default function Detail() {
+
+  const [liked, setLiked] = useState(false);
   return (
     <div className="detail-screen">
       <main className="detail-body">
@@ -37,7 +42,17 @@ export default function Detail() {
             </div>
 
             <div className="detail-like-wrap">
-              <button className="detail-like-btn">❤️</button>
+              <button
+                type="button"
+                className="detail-like-btn"
+                onClick={() => setLiked((prev) => !prev)}
+              >
+                <img
+                  src={liked ? HeartFilled : HeartDefault}
+                  alt="좋아요"
+                  className="detail-like-icon"
+                />
+              </button>
               <span className="detail-like-count">347</span>
             </div>
           </div>
