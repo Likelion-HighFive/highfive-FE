@@ -26,6 +26,7 @@ export default function App() {
       <Route path="/likes" element={<LikesPage />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/navigation" element={<NavigationStart />} />
+      <Route path="/navigation/:pathId" element={<NavigationStart />} />
       <Route path="/footprint" element={<MyCarbonFootprint />} />
       <Route path="/change-name" element={<ChangeNamePage />} />
       <Route path="/create-path" element={<CreatePathPage />} />
