@@ -31,6 +31,7 @@ export default function App() {
       <Route path="/create-path" element={<CreatePathPage />} />
       <Route path="/complete" element={<Complete />} />
       <Route path="/detail" element={<Detail />} />
+      <Route path="/detail/:pathId" element={<Detail />} />
     </Routes>
   );
 }
