@@ -7,7 +7,6 @@ export default function Complete() {
   return (
     <div className="complete-screen">
       <main className="complete-body">
-        {/* 상단 텍스트 영역 */}
         <header className="complete-header">
           <p className="complete-subtitle">매일매일 산책</p>
 
@@ -24,7 +23,6 @@ export default function Complete() {
           </div>
         </header>
 
-        {/* 정보 영역 */}
         <section className="complete-info">
           <div className="complete-info-left">
             <div className="complete-info-row">
@@ -42,7 +40,6 @@ export default function Complete() {
           </div>
 
           <div className="complete-like">
-            {/* 하트 아이콘 */}
             <button type="button" className="complete-like-btn">
               ♡
             </button>
@@ -50,18 +47,15 @@ export default function Complete() {
           </div>
         </section>
 
-        {/* 버튼 */}
+
         <section className="complete-map-section">
           {/* 나중에 지도 이미지 / API  */}
           <div className="complete-map-placeholder"></div>
 
-          {/* 플로팅 버튼 */}
           <div className="complete-fab-wrap">
             <FloatingActionButtons />
           </div>
         </section>
-
-        {/* 루트 텍스트 */}
         <p className="complete-route">
           루트: 한성대입구역 <span className="route-dashed">····</span> 혜화역
         </p>

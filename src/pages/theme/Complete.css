@@ -9,8 +9,7 @@
     font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR",
       sans-serif;
   }
-  
-  /* 내용 부분 – 메뉴바 위까지 */
+
   .complete-body {
     flex: 1;
     padding: 24px 20px 12px;
@@ -37,8 +36,8 @@
   }
   
   .complete-steps-unit {
-    font-size: 32px;
-    font-weight: 600;
+    font-size: 37px;
+    font-weight: 700;
   }
   
   .complete-meta-row {
@@ -138,7 +137,7 @@
     overflow: hidden;
   }
   
-  /* 플로팅 버튼 위치 – 공통 컴포넌트를 이 래퍼 안에 넣어서 겹치게 */
+  /* 플로팅 버튼 위치 */
   .complete-fab-wrap {
     position: absolute;
     right: 12px;
@@ -174,6 +173,4 @@
     color: #a08adf;
   }
   
-  /* MenuBar 는 컴포넌트 쪽에서 fixed 처리돼 있을 가능성이 높아서
-     여기서는 별도 스타일 안 건드림 */
   

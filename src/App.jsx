@@ -13,6 +13,7 @@ import MyCarbonFootprint from './pages/footprint/MyCarbonFootprint';
 import ChangeNamePage from './pages/user/ChangeNamePage';
 import CreatePathPage from './pages/paths/CreatePathPage';
 import Complete from './pages/theme/Complete.jsx';
+import Detail from './pages/theme/Detail.jsx';
 
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
       <Route path="/change-name" element={<ChangeNamePage />} />
       <Route path="/create-path" element={<CreatePathPage />} />
       <Route path="/complete" element={<Complete />} />
+      <Route path="/detail" element={<Detail />} />
     </Routes>
   );
 }
