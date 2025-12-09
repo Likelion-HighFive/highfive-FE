@@ -1,0 +1,126 @@
+.detail-screen {
+    width: 100%;
+    max-width: 393px;
+    margin: 0 auto;
+    background: #ffffff;
+    font-family: system-ui, -apple-system, "Noto Sans KR", sans-serif;
+  }
+  
+  .detail-body {
+    padding-bottom: 120px; /* 메뉴바 + 플로팅버튼 여백 */
+  }
+  
+  /* 🔵 상단 이미지 */
+  .detail-top-image-wrap {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+  }
+  
+  .detail-top-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .detail-thumb-image {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 16px;
+    position: absolute;
+    bottom: -20px;
+    left: 24px;
+    border: 4px solid #ffffff;
+  }
+  
+  /* 🔵 본문 정보 */
+  .detail-info-section {
+    padding: 40px 24px 0;
+  }
+  
+  .detail-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  
+  .detail-info-grid {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .detail-info-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 8px;
+  }
+  
+  .label {
+    width: 60px;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .value {
+    font-size: 14px;
+    color: #111;
+  }
+  
+  /* 하트 */
+  .detail-like-wrap {
+    position: absolute;
+    right: 0;
+    top: 0;
+    text-align: center;
+  }
+  
+  .detail-like-btn {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .detail-like-count {
+    font-size: 12px;
+    color: #666;
+  }
+  
+  /* 걷기 시작 버튼 */
+  .detail-start-button {
+    width: 100%;
+    height: 52px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+  
+  /* 🔵 지도 */
+  .detail-map-section {
+    padding: 24px;
+    position: relative;
+  }
+  
+  .detail-map-placeholder {
+    width: 100%;
+    height: 260px;
+    background: #f2f2f2;
+    border-radius: 16px;
+  }
+  
+  /* 🔵 루트 */
+  .detail-route {
+    font-size: 14px;
+    color: #444;
+    padding: 0 24px 100px;
+  }
+  
+  .route-dashed {
+    color: #aaa;
+  }
+  
