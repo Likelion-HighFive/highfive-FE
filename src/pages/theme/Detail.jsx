@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "./Detail.css";
 
 import MenuBar from "../../components/common/MenuBar";
@@ -16,6 +16,7 @@ import { pathsService } from "../../api/paths";
 export default function Detail() {
 
   const { pathId } = useParams(); 
+  const navigate = useNavigate();
   const [detail, setDetail] = useState(null);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -133,7 +134,9 @@ export default function Detail() {
           </div>
 
 
-          <button className="detail-start-button">걷기 시작</button>
+          <button className="detail-start-button" onClick={() => navigate(`/navigation/${pathId}`)}>
+            걷기 시작
+          </button>
         </section>
 
 
