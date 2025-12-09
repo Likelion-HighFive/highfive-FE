@@ -1,24 +1,43 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import "./Complete.css";
 import MenuBar from "../../components/common/MenuBar";
 import FloatingActionButtons from "../../components/common/FloatingActionButtons";
 
+function formatDuration(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}분${s.toString().padStart(2, "0")}초`;
+}
+
 export default function Complete() {
+
+  const { state } = useLocation();
+  const result = state?.walkingResult;
+
+  const steps = result?.steps ?? 244;
+  const duration = result?.duration ?? 20 * 60 + 58;
+  const totalDistance = result?.distance ?? 1200;
+  const pathName = result?.path_name ?? "매일매일 산책";
+  const walkedAt = result?.walked_at
+    ? new Date(result.walked_at).toISOString().slice(0, 10).replace(/-/g, ".")
+    : "2025.11.21";
+
   return (
     <div className="complete-screen">
       <main className="complete-body">
         <header className="complete-header">
-          <p className="complete-subtitle">매일매일 산책</p>
+          <p className="complete-subtitle">{pathName}</p>
 
           <h1 className="complete-steps">
-            <span className="complete-steps-number">244</span>
+            <span className="complete-steps-number">{steps}</span>
             <span className="complete-steps-unit"> 걸음</span>
           </h1>
 
           <div className="complete-meta-row">
             <span className="complete-meta-label">현재 걸음 수</span>
             <span className="complete-meta-value">
-              총 소요시간 <strong>20분58초</strong>
+              총 소요시간 <strong>{formatDuration(duration)}</strong>
             </span>
           </div>
         </header>
@@ -30,12 +49,14 @@ export default function Complete() {
               <span className="info-value">감성길</span>
             </div>
             <div className="complete-info-row">
-              <span className="info-label">등록일</span>
-              <span className="info-value">2025.11.21</span>
+              <span className="info-label">날짜</span>
+              <span className="info-value">{walkedAt}</span>
             </div>
             <div className="complete-info-row">
-              <span className="info-label">소개글</span>
-              <span className="info-value">한걸음이라도 여유있게</span>
+              <span className="info-label">이동 거리</span>
+              <span className="info-value">
+                {totalDistance}m
+              </span>
             </div>
           </div>
 
