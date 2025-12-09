@@ -19,4 +19,35 @@ export const walkingService = {
       );
     }
   },
+
+  endSession: async ({
+    sessionId,
+    pathId,
+    steps,
+    duration,
+    distance,
+    isCompleted,
+  }) => {
+    try {
+      const res = await apiClient.post(
+        `${WALKING_API_URL}/${sessionId}/end`,
+        {
+          path_id: Number(pathId),
+          steps: Number(steps),
+          duration: Number(duration),
+          distance: Number(distance),
+          is_completed: !!isCompleted,
+        }
+      );
+
+      return res.data.data;
+    } catch (error) {
+      console.error("산책 세션 종료 오류:", error);
+      throw (
+        error.response?.data || {
+          message: "산책 세션을 종료하는 중 오류가 발생했습니다.",
+        }
+      );
+    }
+  },
 };

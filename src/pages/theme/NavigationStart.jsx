@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "./NavigationStart.css";
 
 import Foot1 from "../../assets/foot1.svg";
@@ -9,10 +9,16 @@ import { walkingService } from "../../api/walking";
 
 export default function NavigationStart() {
   const { pathId } = useParams();
+  const navigate = useNavigate();
 
   const [sessionId, setSessionId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const [currentSteps] = useState(244);
+  const [totalSteps] = useState(2014);
+  const [durationSeconds] = useState(20 * 60 + 58); 
+  const [distance] = useState(1200);
 
   useEffect(() => {
     const startWalking = async () => {
@@ -42,6 +48,27 @@ export default function NavigationStart() {
     startWalking();
   }, [pathId]);
 
+  const handleEndClick = async () => {
+    try {
+      if (!sessionId) {
+        throw new Error("세션 정보가 없습니다.");
+      }
+
+      const result = await walkingService.endSession({
+        sessionId,
+        pathId,
+        steps: totalSteps,
+        duration: durationSeconds,
+        distance,
+        isCompleted: true,
+      });
+
+      navigate("/complete", { state: { walkingResult: result } });
+    } catch (error) {
+      alert(error.message || "산책 종료 중 오류가 발생했습니다.");
+    }
+  };
+
   if (loading) {
     return <p>산책 세션을 시작하는 중...</p>;
   }
@@ -61,15 +88,13 @@ export default function NavigationStart() {
         <img src={Foot2} className="foot-img foot2" alt="foot" />
         <img src={Foot3} className="foot-img foot3" alt="foot" />
         
-        <h1 className="nav-current-step">244 걸음</h1>
+        <h1 className="nav-current-step">{currentSteps} 걸음</h1>
         <p className="nav-label">현재 걸음 수</p>
-        <p className="nav-total-steps">누적 걸음 수 2,014</p>
+        <p className="nav-total-steps">누적 걸음 수 {totalSteps.toLocaleString()}</p>
 
         <button
           className="nav-stop-button"
-          onClick={() => {
-            console.log("세션 종료 (sessionId):", sessionId);
-          }}
+          onClick={handleEndClick}
         >
           걷기 종료하기
         </button>
