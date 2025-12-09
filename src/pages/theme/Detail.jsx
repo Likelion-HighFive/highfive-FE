@@ -1,44 +1,119 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import "./Detail.css";
 
 import MenuBar from "../../components/common/MenuBar";
 import FloatingActionButtons from "../../components/common/FloatingActionButtons";
 
-import topImage from "../../assets/detail_top.svg"; 
-import thumbImage from "../../assets/detail_thumb.svg"; 
+import topImageFallback from "../../assets/detail_top.svg"; 
+import thumbImageFallback from "../../assets/detail_thumb.svg"; 
 import HeartDefault from "../../assets/Heart.svg";
 import HeartFilled from "../../assets/HeartFilled.png";
+
+import { pathsService } from "../../api/paths";
 
 
 export default function Detail() {
 
+  const { pathId } = useParams(); 
+  const [detail, setDetail] = useState(null);
   const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    const fetchDetail = async () => {
+      try {
+        setLoading(true);
+        setErrorMsg("");
+
+        const data = await pathsService.getPathDetail(pathId);
+
+        setDetail(data);
+        setLiked(!!data.is_liked);
+        setLikeCount(data.likes_count ?? 0);
+      } catch (error) {
+        setErrorMsg(error.message || "코스 정보를 불러오지 못했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (pathId) fetchDetail();
+  }, [pathId]);
+
+  const handleLikeClick = () => {
+    setLiked((prev) => !prev);
+    setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+  };
+
+  if (loading) {
+    return (
+      <div className="detail-screen">
+        <main className="detail-body">
+          <p>로딩 중...</p>
+        </main>
+      </div>
+    );
+  }
+
+  if (errorMsg || !detail) {
+    return (
+      <div className="detail-screen">
+        <main className="detail-body">
+          <p>{errorMsg || "코스 정보를 찾을 수 없습니다."}</p>
+        </main>
+      </div>
+    );
+  }
+
+   // 이미지 처리
+   const images = detail.images || [];
+   const topImage = images[0]?.image_url || topImageFallback;
+   const thumbImage =
+     images.find((img) => img.is_representative)?.image_url ||
+     thumbImageFallback;
+ 
+   // 등록일
+   const createdAt = detail.created_at
+     ? new Date(detail.created_at)
+         .toISOString()
+         .slice(0, 10)
+         .replace(/-/g, ".")
+     : "";
+ 
+   // 종류
+   const pathTypes = Array.isArray(detail.path_types)
+     ? detail.path_types.join(", ")
+     : detail.path_types || "";
+
+
   return (
     <div className="detail-screen">
       <main className="detail-body">
-
         <div className="detail-top-image-wrap">
           <img src={topImage} alt="배경 이미지" className="detail-top-image" />
           <img src={thumbImage} alt="썸네일" className="detail-thumb-image" />
         </div>
 
         <section className="detail-info-section">
-          <h2 className="detail-title">매일매일 산책</h2>
+          <h2 className="detail-title">{detail.name}</h2>
 
           <div className="detail-info-grid">
             <div className="detail-info-row">
               <span className="label">종류</span>
-              <span className="value">감성길</span>
+              <span className="value">{pathTypes}</span>
             </div>
 
             <div className="detail-info-row">
               <span className="label">등록일</span>
-              <span className="value">2025.11.21</span>
+              <span className="value">{createdAt}</span>
             </div>
 
             <div className="detail-info-row">
               <span className="label">소개글</span>
-              <span className="value">한걸음이라도 여유있게</span>
+              <span className="value">{detail.introduction}</span>
             </div>
 
             <div className="detail-like-wrap">
@@ -53,7 +128,7 @@ export default function Detail() {
                   className="detail-like-icon"
                 />
               </button>
-              <span className="detail-like-count">347</span>
+              <span className="detail-like-count">{likeCount}</span>
             </div>
           </div>
 
@@ -71,7 +146,8 @@ export default function Detail() {
         </section>
 
         <p className="detail-route">
-          루트: 한성대입구역 <span className="route-dashed">····</span> 혜화역
+          루트: {detail.start_location}{" "}
+          <span className="route-dashed">····</span> {detail.end_location}
         </p>
 
       </main>

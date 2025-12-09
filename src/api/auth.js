@@ -14,20 +14,28 @@ export async function login({ email, password, nickname }) {
     }),
   });
 
-  const data = await response.json().catch(() => null);
+  const resJson = await response.json().catch(() => null);
 
-  if (!response.ok) {
+  if (!response.ok || !resJson?.isSuccess) {
     const message =
-      data?.message ||
-      data?.detail?.[0]?.msg ||
+      resJson?.message ||
+      resJson?.detail?.[0]?.msg ||
       `로그인에 실패했습니다. (status: ${response.status})`;
     const error = new Error(message);
     error.status = response.status;
-    error.data = data;
+    error.data = resJson;
     throw error;
   }
 
-  return data;
+  const accessToken = resJson.data?.access_token;
+  const tokenType = resJson.data?.token_type || "Bearer";
+
+  if (accessToken) {
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("tokenType", tokenType);
+  }
+
+  return resJson;
 }
 
 export async function signup({ email, password, nickname }) {
