@@ -6,6 +6,7 @@ import Foot1 from "../../assets/foot1.svg";
 import Foot2 from "../../assets/foot2.svg";
 import Foot3 from "../../assets/foot3.svg";
 import { walkingService } from "../../api/walking";
+import MapImage from "../../assets/detail_map.svg";
 
 export default function NavigationStart() {
   const { pathId } = useParams();
@@ -80,6 +81,11 @@ export default function NavigationStart() {
   return (
     <div className="nav-start-screen">
       <div className="nav-map-placeholder">
+        <img 
+          src={MapImage} 
+          alt="지도 미리보기" 
+          className="nav-map-image"
+        />
       </div>
 
       <div className="nav-info-section">

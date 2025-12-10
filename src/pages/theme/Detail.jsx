@@ -9,6 +9,7 @@ import topImageFallback from "../../assets/detail_top.svg";
 import thumbImageFallback from "../../assets/detail_thumb.svg"; 
 import HeartDefault from "../../assets/Heart.svg";
 import HeartFilled from "../../assets/HeartFilled.png";
+import MapImage from "../../assets/detail_map.svg";
 
 import { pathsService } from "../../api/paths";
 
@@ -142,11 +143,15 @@ export default function Detail() {
 
         <section className="detail-map-section">
           <div className="detail-map-placeholder">
-            {/* 나중에 지도 API*/}
+            <img
+              src={MapImage}
+              alt="산책 코스 지도"
+              className="detail-map-image"
+            />
           </div>
 
           <FloatingActionButtons stepCount={2014} position="inline" />
-        </section>
+        </section>``
 
         <p className="detail-route">
           루트: {detail.start_location}{" "}
