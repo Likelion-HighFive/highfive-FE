@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import "./Complete.css";
 import MenuBar from "../../components/common/MenuBar";
 import FloatingActionButtons from "../../components/common/FloatingActionButtons";
+import MapImage from "../../assets/detail_map.svg";
 
 function formatDuration(seconds) {
   const m = Math.floor(seconds / 60);
@@ -70,8 +71,13 @@ export default function Complete() {
 
 
         <section className="complete-map-section">
-          {/* 나중에 지도 이미지 / API  */}
-          <div className="complete-map-placeholder"></div>
+          <div className="complete-map-placeholder">
+            <img
+              src={MapImage}
+              alt="산책 코스 지도"
+              className="complete-map-image"
+            />
+          </div>
 
           <div className="complete-fab-wrap">
             <FloatingActionButtons />
