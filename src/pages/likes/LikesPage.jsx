@@ -4,6 +4,7 @@ import axios from 'axios';
 import styles from './LikesPage.module.css';
 import MenuBar from '../../components/common/MenuBar';
 import FloatingActionButtons from '../../components/common/FloatingActionButtons';
+import { walkingService } from '../../api/walking';
 
 // 아이콘 및 이미지 임포트
 import searchIcon from '../../assets/icons/search.svg';
@@ -21,6 +22,7 @@ const LikesPage = () => {
   const [paths, setPaths] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [stepCount, setStepCount] = useState(0); // 걸음수 상태 추가
 
   // 카테고리 목록
   const categories = [
@@ -119,6 +121,20 @@ const LikesPage = () => {
   // 컴포넌트 마운트 시 또는 카테고리 변경 시 좋아요한 경로 가져오기
   useEffect(() => {
     fetchLikedPaths();
+    
+    // Fetch step count
+    const fetchStepCount = async () => {
+      try {
+        const response = await walkingService.getWalkingSummary();
+        if (response.isSuccess && response.data) {
+          setStepCount(response.data.total_steps || 0);
+        }
+      } catch (error) {
+        console.error('걸음수 조회 중 오류:', error);
+      }
+    };
+
+    fetchStepCount();
   }, [selectedCategory]);
 
   // 검색 핸들러
@@ -126,6 +142,15 @@ const LikesPage = () => {
     e.preventDefault();
     console.log('검색어:', searchQuery);
     // 여기에 검색 로직 추가
+  };
+
+  // 플로팅 액션 버튼 핸들러
+  const handleAddPath = () => {
+    navigate('/create-path');
+  };
+
+  const handleShowSteps = () => {
+    navigate('/footprint');
   };
 
   // 카테고리 선택 핸들러
@@ -276,7 +301,12 @@ const LikesPage = () => {
       </main>
 
       {/* 플로팅 버튼 */}
-      <FloatingActionButtons />
+      <FloatingActionButtons 
+        onAddPath={handleAddPath}
+        onShowSteps={handleShowSteps}
+        stepCount={stepCount}
+        isHome={false}
+      />
       
       {/* Navigation */}
       <MenuBar active="likes" />
