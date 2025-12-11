@@ -4,14 +4,15 @@ import "./Detail.css";
 
 import MenuBar from "../../components/common/MenuBar";
 import FloatingActionButtons from "../../components/common/FloatingActionButtons";
+import RouteMap from "../../components/RouteMap";
 
 import topImageFallback from "../../assets/detail_top.svg"; 
 import thumbImageFallback from "../../assets/detail_thumb.svg"; 
 import HeartDefault from "../../assets/Heart.svg";
 import HeartFilled from "../../assets/HeartFilled.png";
-import MapImage from "../../assets/detail_map.svg";
 
 import { pathsService } from "../../api/paths";
+import { kakaoApi } from "../../api/kakao";
 
 
 export default function Detail() {
@@ -23,6 +24,42 @@ export default function Detail() {
   const [likeCount, setLikeCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  
+  // 지도 관련 상태
+  const [routeCoordinates, setRouteCoordinates] = useState([]);
+  const [startPoint, setStartPoint] = useState(null);
+  const [endPoint, setEndPoint] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [mapLoading, setMapLoading] = useState(false);
+
+  // Kakao API를 통해 경로 정보 가져오기
+  const fetchRoute = async (startX, startY, endX, endY, courseName) => {
+    try {
+      setMapLoading(true);
+      const response = await kakaoApi.getPedestrianRoute({
+        startX,
+        startY,
+        endX,
+        endY,
+        startName: courseName || '출발지',
+        endName: courseName || '도착지',
+      });
+
+      if (response.isSuccess && response.data) {
+        const parsedRoute = kakaoApi.parseRouteResponse(response.data);
+        setRouteCoordinates(parsedRoute.coordinates);
+        console.log('경로 좌표 설정:', parsedRoute.coordinates);
+      } else {
+        console.warn('경로 데이터 없음:', response);
+        setRouteCoordinates([]);
+      }
+    } catch (error) {
+      console.error('경로 정보 조회 실패:', error);
+      setRouteCoordinates([]);
+    } finally {
+      setMapLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -35,6 +72,29 @@ export default function Detail() {
         setDetail(data);
         setLiked(!!data.is_liked);
         setLikeCount(data.likes_count ?? 0);
+
+        // 경로 데이터에서 시작/끝 좌표 추출
+        if (data.start_location && data.end_location) {
+          const [startLat, startLng] = data.start_location.split(',').map(Number);
+          const [endLat, endLng] = data.end_location.split(',').map(Number);
+          
+          // 좌표 유효성 검사
+          if (!startLat || !startLng || !endLat || !endLng) {
+            setErrorMsg("시작 위치가 유효하지 않습니다.");
+            setLoading(false);
+            return;
+          }
+          
+          setStartPoint({ lat: startLat, lng: startLng });
+          setEndPoint({ lat: endLat, lng: endLng });
+
+          // Tmap API 호출하여 경로 정보 가져오기
+          await fetchRoute(startLng, startLat, endLng, endLat, data.name);
+        } else {
+          setErrorMsg("시작 위치가 없습니다.");
+          setLoading(false);
+          return;
+        }
       } catch (error) {
         setErrorMsg(error.message || "코스 정보를 불러오지 못했습니다.");
       } finally {
@@ -44,6 +104,23 @@ export default function Detail() {
 
     if (pathId) fetchDetail();
   }, [pathId]);
+
+  // 사용자 현재 위치 가져오기 (선택사항)
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCurrentLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.log('위치 정보를 가져올 수 없습니다:', error);
+        }
+      );
+    }
+  }, []);
 
   const handleLikeClick = () => {
     setLiked((prev) => !prev);
@@ -122,7 +199,7 @@ export default function Detail() {
               <button
                 type="button"
                 className="detail-like-btn"
-                onClick={() => setLiked((prev) => !prev)}
+                onClick={handleLikeClick}
               >
                 <img
                   src={liked ? HeartFilled : HeartDefault}
@@ -143,19 +220,26 @@ export default function Detail() {
 
         <section className="detail-map-section">
           <div className="detail-map-placeholder">
-            <img
-              src={MapImage}
-              alt="산책 코스 지도"
-              className="detail-map-image"
-            />
+            {mapLoading ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                <p>지도를 로딩 중입니다...</p>
+              </div>
+            ) : (
+              <RouteMap
+                startPoint={startPoint}
+                endPoint={endPoint}
+                routeCoordinates={routeCoordinates}
+                currentLocation={currentLocation}
+              />
+            )}
           </div>
 
           <FloatingActionButtons stepCount={2014} position="inline" />
-        </section>``
+        </section>
 
         <p className="detail-route">
-          루트: {detail.start_location}{" "}
-          <span className="route-dashed">····</span> {detail.end_location}
+          {detail.distance > 0 ? `약 ${detail.distance}km · ` : ''}
+          {Math.ceil(detail.estimated_time / 60)}분
         </p>
 
       </main>
