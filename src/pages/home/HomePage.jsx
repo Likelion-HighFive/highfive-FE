@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './HomePage.module.css';
 import MenuBar from '../../components/common/MenuBar';
 import FloatingActionButtons from '../../components/common/FloatingActionButtons';
+import { walkingService } from '../../api/walking';
 
 // 아이콘 및 이미지 임포트
 import areaLogo from '../../assets/images/logo/area_logo.svg';
@@ -18,6 +19,23 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
+  const [stepCount, setStepCount] = useState(0); // 걸음수 상태 추가
+  
+  // 걸음수 가져오기
+  useEffect(() => {
+    const fetchStepCount = async () => {
+      try {
+        const response = await walkingService.getWalkingSummary();
+        if (response.isSuccess && response.data) {
+          setStepCount(response.data.total_steps || 0);
+        }
+      } catch (error) {
+        console.error('걸음수 조회 중 오류:', error);
+      }
+    };
+
+    fetchStepCount();
+  }, []);
 
   // 검색 핸들러
   const handleSearch = (e) => {
@@ -27,14 +45,14 @@ const HomePage = () => {
   };
 
   // 플로팅 액션 버튼 핸들러
-  const handleAddPath = () => {
-    // 경로 추가 로직
-    console.log('경로 추가하기');  
+  const handleAddPath = (e) => {
+    if (e) e.preventDefault();
+    navigate('/create-path');
   };
 
-  const handleShowSteps = () => {
-    // 걸음수 보기 로직
-    console.log('걸음수 보기');
+  const handleShowSteps = (e) => {
+    if (e) e.preventDefault();
+    navigate('/footprint');
   };
 
   // 카테고리 버튼 데이터
@@ -95,7 +113,7 @@ const HomePage = () => {
       <FloatingActionButtons 
         onAddPath={handleAddPath}
         onShowSteps={handleShowSteps}
-        stepCount={0}
+        stepCount={stepCount}
         isHome={true}
       />
 

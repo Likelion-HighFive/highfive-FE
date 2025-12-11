@@ -50,4 +50,18 @@ export const walkingService = {
       );
     }
   },
+
+  getWalkingSummary: async () => {
+    try {
+      const response = await apiClient.get(`${WALKING_API_URL}/summary`);
+      return response.data;
+    } catch (error) {
+      console.error("산책 통계 조회 오류:", error);
+      throw (
+        error.response?.data || {
+          message: "산책 통계를 불러오는 중 오류가 발생했습니다.",
+        }
+      );
+    }
+  },
 };
