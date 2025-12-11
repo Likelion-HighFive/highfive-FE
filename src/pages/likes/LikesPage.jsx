@@ -17,7 +17,7 @@ const LikesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('likes');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
-  const [sortBy, setSortBy] = useState('recommended');
+  const [sortBy, setSortBy] = useState('latest');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [paths, setPaths] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,8 +62,8 @@ const LikesPage = () => {
       // Add sort parameter
       if (sortBy) {
         const sortMapping = {
-          'recommended': 'RECOMMENDED',
           'latest': 'LATEST',
+          'recommended': 'RECOMMENDED',
           'likes': 'LIKES',
           'distance': 'DISTANCE'
         };
@@ -254,12 +254,16 @@ const LikesPage = () => {
             className={styles.sortDropdown}
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            {sortBy === 'recommended' ? '추천순' : '최신순'}
+            {sortBy === 'recommended' ? '추천순' : 
+             sortBy === 'latest' ? '최신순' :
+             sortBy === 'likes' ? '좋아요순' : '거리순'}
             <span className={styles.dropdownArrow}>▼</span>
             {isDropdownOpen && (
               <div className={styles.dropdownMenu}>
                 <div onClick={() => handleSortSelect('recommended')}>추천순</div>
                 <div onClick={() => handleSortSelect('latest')}>최신순</div>
+                <div onClick={() => handleSortSelect('likes')}>좋아요순</div>
+                <div onClick={() => handleSortSelect('distance')}>거리순</div>
               </div>
             )}
           </div>
