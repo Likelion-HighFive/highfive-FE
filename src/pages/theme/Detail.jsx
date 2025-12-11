@@ -73,11 +73,22 @@ export default function Detail() {
           const [startLat, startLng] = data.start_location.split(',').map(Number);
           const [endLat, endLng] = data.end_location.split(',').map(Number);
           
+          // 좌표 유효성 검사
+          if (!startLat || !startLng || !endLat || !endLng) {
+            setErrorMsg("시작 위치가 유효하지 않습니다.");
+            setLoading(false);
+            return;
+          }
+          
           setStartPoint({ lat: startLat, lng: startLng });
           setEndPoint({ lat: endLat, lng: endLng });
 
           // Tmap API 호출하여 경로 정보 가져오기
           await fetchRoute(startLng, startLat, endLng, endLat, data.name);
+        } else {
+          setErrorMsg("시작 위치가 없습니다.");
+          setLoading(false);
+          return;
         }
       } catch (error) {
         setErrorMsg(error.message || "코스 정보를 불러오지 못했습니다.");
@@ -219,11 +230,10 @@ export default function Detail() {
           </div>
 
           <FloatingActionButtons stepCount={2014} position="inline" />
-        </section>``
+        </section>
 
         <p className="detail-route">
-          루트: {detail.start_location}{" "}
-          <span className="route-dashed">····</span> {detail.end_location}
+          약 {detail.distance}km · {Math.ceil(detail.estimated_time / 60)}분
         </p>
 
       </main>

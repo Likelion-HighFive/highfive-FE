@@ -3,16 +3,12 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import styles from './RouteMap.module.css';
 
-/**
- * 경로 지도 표시 컴포넌트
- * Leaflet 기반 지도에 Tmap API로부터 받은 경로를 표시
- */
 const RouteMap = ({
-  startPoint = null, // { lat: number, lng: number }
-  endPoint = null, // { lat: number, lng: number }
-  routeCoordinates = [], // [{ lat, lng }, ...]
-  currentLocation = null, // { lat: number, lng: number } - 사용자 현재 위치
-  instructions = [], // turn-by-turn 안내 데이터
+  startPoint = null,
+  endPoint = null,
+  routeCoordinates = [],
+  currentLocation = null,
+  instructions = [],
 }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -24,40 +20,39 @@ const RouteMap = ({
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // 기본 중심점 (서울)
-    const defaultCenter = [37.5665, 126.978];
+    // 시작 위치 필수
+    if (!startPoint) {
+      return;
+    }
     
-    map.current = L.map(mapContainer.current).setView(defaultCenter, 13);
+    map.current = L.map(mapContainer.current).setView([startPoint.lat, startPoint.lng], 13);
 
-    // OSM 타일 추가
+    // OSM 타일
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
       maxZoom: 19,
     }).addTo(map.current);
 
-    // 레이어 그룹 생성 (경로와 마커를 관리하기 위함)
     routeLayerGroup.current = L.layerGroup().addTo(map.current);
     markerLayerGroup.current = L.layerGroup().addTo(map.current);
 
-    // cleanup
     return () => {
       if (map.current) {
         map.current.remove();
         map.current = null;
       }
     };
-  }, []);
+  }, [startPoint]);
 
-  // 경로 표시
+  // 경로 polyline 그리기
   useEffect(() => {
     if (!map.current || !routeLayerGroup.current || routeCoordinates.length === 0) {
       return;
     }
 
-    // 기존 경로 레이어 제거
     routeLayerGroup.current.clearLayers();
 
-    // 경로 polyline 그리기
+    // polyline 그리기
     const latLngs = routeCoordinates.map((coord) => [coord.lat, coord.lng]);
     const polyline = L.polyline(latLngs, {
       color: '#3388ff',
@@ -67,17 +62,17 @@ const RouteMap = ({
       lineJoin: 'round',
     }).addTo(routeLayerGroup.current);
 
-    // 경로에 맞춰 지도 줌/팬 조정
+    // 시작/끝 위치에 포커싱
     map.current.fitBounds(polyline.getBounds(), { padding: [50, 50] });
   }, [routeCoordinates]);
 
-  // 출발지, 도착지 마커 표시
+  // 출발지/도착지 마커
   useEffect(() => {
     if (!map.current || !markerLayerGroup.current) return;
 
     markerLayerGroup.current.clearLayers();
 
-    // 출발지 마커 (초록색)
+    // 출발지 (초록색)
     if (startPoint) {
       L.marker([startPoint.lat, startPoint.lng], {
         icon: L.icon({
@@ -93,7 +88,7 @@ const RouteMap = ({
         .addTo(markerLayerGroup.current);
     }
 
-    // 도착지 마커 (빨간색)
+    // 도착지 (빨간색)
     if (endPoint) {
       L.marker([endPoint.lat, endPoint.lng], {
         icon: L.icon({
@@ -110,17 +105,15 @@ const RouteMap = ({
     }
   }, [startPoint, endPoint]);
 
-  // 사용자 현재 위치 표시 (파란색 원형)
+  // 현재 위치 표시
   useEffect(() => {
     if (!map.current) return;
 
     if (currentLocation) {
-      // 기존 마커 제거
       if (userLocationMarker.current) {
         userLocationMarker.current.remove();
       }
 
-      // 새로운 위치 마커 추가
       userLocationMarker.current = L.circleMarker([currentLocation.lat, currentLocation.lng], {
         radius: 8,
         fillColor: '#2196F3',
@@ -131,9 +124,6 @@ const RouteMap = ({
       })
         .addTo(map.current)
         .bindPopup('현재 위치');
-
-      // 현재 위치로 이동
-      map.current.panTo([currentLocation.lat, currentLocation.lng]);
     } else if (userLocationMarker.current) {
       userLocationMarker.current.remove();
       userLocationMarker.current = null;

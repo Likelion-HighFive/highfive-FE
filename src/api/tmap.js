@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Tmap API 기본 설정
+// Tmap API 클라이언트
 const tmapApiClient = axios.create({
   baseURL: 'https://apis.openapi.sk.com',
   headers: {
@@ -8,17 +8,6 @@ const tmapApiClient = axios.create({
   },
 });
 
-/**
- * Tmap 도보 경로 찾기 API 호출
- * @param {Object} params - API 요청 파라미터
- * @param {number} params.startX - 출발지 경도 (WGS84)
- * @param {number} params.startY - 출발지 위도 (WGS84)
- * @param {number} params.endX - 도착지 경도 (WGS84)
- * @param {number} params.endY - 도착지 위도 (WGS84)
- * @param {string} [params.startName] - 출발지 이름
- * @param {string} [params.endName] - 도착지 이름
- * @returns {Promise<Object>} Tmap API 응답 (polyline, features 등)
- */
 export const tmapApi = {
   // 도보 경로 찾기
   getPedestrianRoute: async ({
@@ -39,9 +28,8 @@ export const tmapApi = {
           endY,
           startName,
           endName,
-          // 추가 옵션
-          reqCoordType: 'WGS84Geo', // 요청 좌표 타입
-          resCoordType: 'WGS84Geo', // 응답 좌표 타입
+          reqCoordType: 'WGS84Geo',
+          resCoordType: 'WGS84Geo',
           ticketId: import.meta.env.VITE_TMAP_API_KEY,
         }
       );
@@ -64,7 +52,7 @@ export const tmapApi = {
     }
   },
 
-
+  // Polyline 문자열 좌표로 변환
   decodePolyline: (polyline) => {
     const points = [];
     let index = 0,
@@ -109,16 +97,16 @@ export const tmapApi = {
   parseRouteResponse: (apiResponse) => {
     const features = apiResponse.features || [];
     const routeInfo = {
-      totalDistance: 0, // 미터 단위
-      totalTime: 0, // 초 단위
+      totalDistance: 0,
+      totalTime: 0,
       polyline: null,
-      instructions: [], // 안내 포인트 배열
-      coordinates: [], // 좌표 배열
+      instructions: [],
+      coordinates: [],
     };
 
     features.forEach((feature) => {
       if (feature.geometry.type === 'LineString') {
-        // 경로 정보
+        // 경로 좌표
         const coords = feature.geometry.coordinates;
         routeInfo.coordinates = coords.map(([lng, lat]) => ({
           lat,
@@ -128,7 +116,7 @@ export const tmapApi = {
         routeInfo.totalDistance = feature.properties.distance || 0;
         routeInfo.totalTime = feature.properties.time || 0;
       } else if (feature.geometry.type === 'Point') {
-        // 경로 안내 포인트
+        // 안내 지점
         const description = feature.properties.description || '';
         if (description) {
           routeInfo.instructions.push({
