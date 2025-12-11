@@ -252,19 +252,9 @@ const BackgroundPage = () => {
                       e.target.src = nightCityBg;
                     }}
                   />
-                  <div className={styles.cardCategory}>
-                    {card.tags && card.tags.length > 0 ? card.tags[0] : '산책로'}
-                  </div>
-                </div>
-                <div className={styles.cardContent}>
-                  <h3 className={styles.cardTitle}>{card.name}</h3>
-                  <p className={styles.cardLocation}>산책로</p>
-                  <div className={styles.cardMeta}>
-                    <span>{card.distance}km · {Math.ceil(card.estimated_time / 60)}분</span>
-                  </div>
-                  <div className={styles.cardActions}>
-                    <div 
-                      className={`${styles.likeButton} ${card.is_liked ? styles.liked : ''}`} 
+                  <div className={styles.likeButtonContainer}>
+                    <button 
+                      className={`${styles.likeButton} ${card.is_liked ? styles.liked : ''}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleLike(card.id);
@@ -275,11 +265,17 @@ const BackgroundPage = () => {
                         alt={card.is_liked ? '좋아요 취소' : '좋아요'} 
                       />
                       <span>{card.likes_count}</span>
-                    </div>
-                    <button className={styles.actionButton}>
-                      <img src={commentIcon} alt="댓글" />
-                      0
                     </button>
+                  </div>
+                  <div className={styles.cardCategory}>
+                    {card.tags && card.tags.length > 0 ? card.tags[0] : '산책로'}
+                  </div>
+                </div>
+                <div className={styles.cardContent}>
+                  <h3 className={styles.cardTitle}>{card.name}</h3>
+                  <p className={styles.cardLocation}>산책로</p>
+                  <div className={styles.cardMeta}>
+                    <span>{card.distance}km · {Math.ceil(card.estimated_time / 60)}분</span>
                   </div>
                 </div>
               </div>
