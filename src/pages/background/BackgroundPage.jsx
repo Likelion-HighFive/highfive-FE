@@ -29,6 +29,7 @@ const BackgroundPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stepCount, setStepCount] = useState(0); // 걸음수 상태
+  const [userLocation, setUserLocation] = useState(null); // 사용자 위치 정보
 
   const LIKED_STORAGE_KEY = "likedPaths";
 
@@ -76,7 +77,10 @@ const BackgroundPage = () => {
   // 검색 핸들러
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('검색어:', searchQuery);
+    if (searchQuery.trim()) {
+      // 검색어가 있는 경우에만 검색 실행
+      fetchPaths({ search: searchQuery });
+    }
   };
 
   // 플로팅 액션 버튼 핸들러
@@ -108,13 +112,39 @@ const BackgroundPage = () => {
     { id: 'DISTANCE', name: '거리순' }
   ];
 
+  // 사용자 위치 정보 가져오기
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation(`${latitude},${longitude}`);
+          return `${latitude},${longitude}`;
+        },
+        (error) => {
+          console.error("위치 정보를 가져오는데 실패했습니다:", error);
+          return null;
+        }
+      );
+    } else {
+      console.log("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
+      return null;
+    }
+  };
+
   // API에서 산책 코스 데이터 가져오기
-  const fetchPaths = async () => {
+  const fetchPaths = async (additionalParams = {}) => {
     try {
       setLoading(true);
+      
+      // 현재 위치 정보를 가져옵니다 (이미 있는 경우는 재사용)
+      const currentLocation = userLocation || await getUserLocation();
+      
       const data = await pathsService.getPaths({
         filter: selectedCategory,
         sort: sortBy,
+        search: additionalParams.search || '',
+        user_location: currentLocation
       });
   
       // 내가 이전에 눌렀던 좋아요 상태 불러오기
@@ -129,7 +159,7 @@ const BackgroundPage = () => {
       setPathCards(merged);
     } catch (err) {
       console.error("산책 코스 조회 오류:", err);
-      setError("산책 코스를 불러오는 중 오류가 발생했습니다.");
+      setError(err.message || "산책 코스를 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -153,7 +183,7 @@ const BackgroundPage = () => {
     };
 
     fetchStepCount();
-  }, [selectedCategory, sortBy]);
+  }, [selectedCategory, sortBy, userLocation]);
 
   // 로딩 중인 경우
   if (loading) {

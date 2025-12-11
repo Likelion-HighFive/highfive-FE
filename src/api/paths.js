@@ -7,22 +7,39 @@ export const pathsService = {
    * 산책 코스 목록 조회
    * @param {Object} options
    * @param {string} options.filter - ALL | EMOTIONAL | CITY_VIEW | NATURE | NIGHT_VIEW | SAFE
-   * @param {string} options.sort   - LATEST | RECOMMENDED | LIKES | DISTANCE
+   * @param {string} options.sort - LATEST | RECOMMENDED | LIKES | DISTANCE
+   * @param {string} options.search - 검색어
+   * @param {string} options.user_location - 사용자 위치 정보 (예: "37.5665,126.9780")
    * @returns {Promise<Array>}
    */
-  getPaths: async ({ filter = "ALL", sort = "LATEST" } = {}) => {
+  getPaths: async ({ 
+    filter = "ALL", 
+    sort = "LATEST",
+    search = null,
+    user_location = null 
+  } = {}) => {
     try {
-      const res = await apiClient.get(PATH_API_URL, {
-        params: { filter, sort },
-      });
-      return res.data.data; // APIResponse 구조에서 data 추출
+      const params = { filter, sort };
+      
+      // Add optional parameters if they are provided
+      if (search) params.search = search;
+      if (user_location) params.user_location = user_location;
+
+      const res = await apiClient.get(PATH_API_URL, { params });
+      
+      // Check if response has the expected structure
+      if (res.data && res.data.isSuccess && Array.isArray(res.data.data)) {
+        return res.data.data;
+      }
+      
+      throw new Error("Invalid API response structure");
+      
     } catch (error) {
       console.error("산책 코스 목록 조회 오류:", error);
-      throw (
-        error.response?.data || {
-          message: "산책 코스를 불러오는 중 오류가 발생했습니다.",
-        }
-      );
+      throw error.response?.data || {
+        message: "산책 코스를 불러오는 중 오류가 발생했습니다.",
+        details: error.message
+      };
     }
   },
 
