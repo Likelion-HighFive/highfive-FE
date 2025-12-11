@@ -39,12 +39,12 @@ const HomePage = () => {
 
   // 카테고리 버튼 데이터
   const categories = [
-    { id: 'all', name: '전체' },
-    { id: 'emotional', name: '감성길' },
-    { id: 'cityview', name: '씨티뷰길' },
-    { id: 'nature', name: '자연길' },
-    { id: 'nightview', name: '야경길' },
-    { id: 'safe', name: '안전길' }
+    { id: 'ALL', name: '전체' },
+    { id: 'EMOTIONAL', name: '감성길' },
+    { id: 'CITY_VIEW', name: '씨티뷰길' },
+    { id: 'NATURE', name: '자연길' },
+    { id: 'NIGHT_VIEW', name: '야경길' },
+    { id: 'SAFE', name: '안전길' }
   ];
 
   return (
@@ -75,7 +75,7 @@ const HomePage = () => {
         {categories.map(category => (
           <button 
             key={category.id}
-            className={`${styles.categoryButton} ${category.id === 'all' ? styles.active : ''}`}
+            className={`${styles.categoryButton} ${category.id === 'ALL' ? styles.active : ''}`}
             onClick={() => navigate('/background', { state: { selectedCategory: category.id } })}
           >
             {category.name}
