@@ -100,6 +100,87 @@ const MyPage = () => {
     }
   };
 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // 파일 크기 검증 (5MB 제한)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('이미지 크기는 5MB를 초과할 수 없습니다.');
+      return;
+    }
+
+    // 파일 타입 검증
+    if (!file.type.match('image/.*')) {
+      toast.error('이미지 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      setIsLoading(true);
+      const response = await fetchWithAuth('/mypage/profile-image', {
+        method: 'PATCH',
+        headers: {
+          // Content-Type은 설정하지 않아야 브라우저가 자동으로 설정하고 boundary를 추가합니다.
+        },
+        body: formData,
+      });
+
+      if (response.isSuccess) {
+        setUserData(prev => ({
+          ...prev,
+          profile_image: response.data.profile_image
+        }));
+        toast.success('프로필 이미지가 업데이트되었습니다.');
+      } else {
+        toast.error(response.message || '프로필 이미지 업데이트에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('프로필 이미지 업데이트 중 오류 발생:', error);
+      toast.error(error.message || '프로필 이미지 업데이트 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+      e.target.value = ''; // 파일 선택을 초기화
+    }
+  };
+
+  const fetchWithAuth = async (url, options = {}) => {
+    const token = localStorage.getItem('accessToken');
+    const tokenType = localStorage.getItem('tokenType') || 'Bearer';
+    
+    const headers = {
+      ...options.headers,
+    };
+
+    if (token) {
+      headers['Authorization'] = `${tokenType} ${token}`;
+    }
+
+    // Content-Type은 FormData인 경우 자동으로 설정되도록 함
+    if (!(options.body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}${url}`, {
+      ...options,
+      headers,
+    });
+
+    const resJson = await response.json().catch(() => ({}));
+
+    if (!response.ok || !resJson?.isSuccess) {
+      const error = new Error(resJson?.message || '요청을 처리하는 중 오류가 발생했습니다.');
+      error.status = response.status;
+      error.data = resJson;
+      throw error;
+    }
+
+    return resJson;
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setNewNickname('');
@@ -127,14 +208,26 @@ const MyPage = () => {
 
         <section className={styles.profileSection}>
           <div className={styles.profileImageContainer}>
-            <img 
-              src={userData.profile_image || profileImage} 
-              alt="프로필" 
-              className={styles.profileImage} 
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = profileImage;
-              }}
+            <label htmlFor="profileImageInput" className={styles.profileImageLabel}>
+              <img 
+                src={userData.profile_image ? userData.profile_image : profileImage} 
+                alt="프로필" 
+                className={styles.profileImage}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = profileImage;
+                }}
+              />
+              <div className={styles.profileImageOverlay}>
+                <span>사진 변경</span>
+              </div>
+            </label>
+            <input
+              id="profileImageInput"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{ display: 'none' }}
             />
           </div>
           <div className={styles.userInfo}>
@@ -155,6 +248,12 @@ const MyPage = () => {
         <div className={styles.buttonGroup}>
           <button className={styles.actionButton} onClick={handleChangeName}>
             이름 변경
+          </button>
+          <button 
+            className={`${styles.actionButton} ${styles.imageButton}`}
+            onClick={() => document.getElementById('profileImageInput').click()}
+          >
+            프로필 사진 변경
           </button>
         </div>
 
