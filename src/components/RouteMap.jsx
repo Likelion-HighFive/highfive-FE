@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useEffect, useRef, useState } from 'react';
 import styles from './RouteMap.module.css';
+import { loadKakaoMapScript } from '../utils/loadKakaoMapScript';
 
+// RouteMap 컴포넌트 - Kakao Maps를 사용한 지도 표시
 const RouteMap = ({
   startPoint = null,
   endPoint = null,
@@ -11,149 +11,233 @@ const RouteMap = ({
   instructions = [],
 }) => {
   const mapContainer = useRef(null);
-  const map = useRef(null);
-  const routeLayerGroup = useRef(null);
-  const markerLayerGroup = useRef(null);
-  const userLocationMarker = useRef(null);
+  const mapRef = useRef(null);
+  const markersRef = useRef([]);
+  const polylinesRef = useRef([]);
+  const [isMapReady, setIsMapReady] = useState(false);
 
-  // 지도 초기화
+  // Kakao Maps SDK 로드 및 지도 초기화
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // 시작 위치 필수
-    if (!startPoint) {
-      return;
-    }
-    
-    map.current = L.map(mapContainer.current).setView([startPoint.lat, startPoint.lng], 13);
+    const initMap = async () => {
+      try {
+        // SDK 로드 대기
+        await loadKakaoMapScript();
 
-    // OSM 타일
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
-      maxZoom: 19,
-    }).addTo(map.current);
+        if (!window.kakao || !window.kakao.maps) {
+          console.warn('Kakao Maps SDK 로드 실패');
+          return;
+        }
 
-    routeLayerGroup.current = L.layerGroup().addTo(map.current);
-    markerLayerGroup.current = L.layerGroup().addTo(map.current);
+        // 시작점 기본값
+        const centerLat = startPoint?.lat || 37.56259379;
+        const centerLng = startPoint?.lng || 126.99243652;
+
+        // Kakao 지도 생성
+        const options = {
+          center: new window.kakao.maps.LatLng(centerLat, centerLng),
+          level: 3,
+        };
+
+        const map = new window.kakao.maps.Map(mapContainer.current, options);
+        mapRef.current = map;
+        setIsMapReady(true);
+        console.log('Kakao Maps 초기화 완료');
+      } catch (error) {
+        console.error('지도 초기화 실패:', error);
+      }
+    };
+
+    initMap();
 
     return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
-      }
+      // 정리: 마커와 폴리라인 제거
+      markersRef.current.forEach((marker) => {
+        if (marker) marker.setMap(null);
+      });
+      markersRef.current = [];
+
+      polylinesRef.current.forEach((polyline) => {
+        if (polyline) polyline.setMap(null);
+      });
+      polylinesRef.current = [];
+      setIsMapReady(false);
     };
   }, [startPoint]);
 
-  // 경로 polyline 그리기
+  // 경로 폴리라인 그리기
   useEffect(() => {
-    if (!map.current || !routeLayerGroup.current || routeCoordinates.length === 0) {
+    if (!isMapReady || !mapRef.current || !window.kakao || routeCoordinates.length === 0) {
+      console.log('경로 좌표 없음 또는 지도 준비 안됨');
       return;
     }
 
-    routeLayerGroup.current.clearLayers();
+    console.log('경로 폴리라인 그리기 시작:', routeCoordinates.length);
 
-    // polyline 그리기
-    const latLngs = routeCoordinates.map((coord) => [coord.lat, coord.lng]);
-    const polyline = L.polyline(latLngs, {
-      color: '#3388ff',
-      weight: 5,
-      opacity: 0.8,
-      lineCap: 'round',
-      lineJoin: 'round',
-    }).addTo(routeLayerGroup.current);
+    // 기존 폴리라인 제거
+    polylinesRef.current.forEach((polyline) => {
+      if (polyline) polyline.setMap(null);
+    });
+    polylinesRef.current = [];
 
-    // 시작/끝 위치에 포커싱
-    map.current.fitBounds(polyline.getBounds(), { padding: [50, 50] });
-  }, [routeCoordinates]);
+    // 좌표를 Kakao LatLng로 변환
+    const pathPoints = routeCoordinates.map(
+      (coord) => new window.kakao.maps.LatLng(coord.lat, coord.lng)
+    );
 
-  // 출발지/도착지 마커
-  useEffect(() => {
-    if (!map.current || !markerLayerGroup.current) return;
+    if (pathPoints.length > 1) {
+      // 흰색 배경 폴리라인 (두께 10px)
+      const polyline1 = new window.kakao.maps.Polyline({
+        path: pathPoints,
+        strokeWeight: 10,
+        strokeColor: '#FFFFFF',
+        strokeOpacity: 0.8,
+        strokeStyle: 'solid',
+      });
+      polyline1.setMap(mapRef.current);
+      polylinesRef.current.push(polyline1);
 
-    markerLayerGroup.current.clearLayers();
+      // 파란색 경로 폴리라인 (두께 6px)
+      const polyline2 = new window.kakao.maps.Polyline({
+        path: pathPoints,
+        strokeWeight: 6,
+        strokeColor: '#4A90E2',
+        strokeOpacity: 0.9,
+        strokeStyle: 'solid',
+      });
+      polyline2.setMap(mapRef.current);
+      polylinesRef.current.push(polyline2);
 
-    // 출발지 (초록색)
-    if (startPoint) {
-      L.marker([startPoint.lat, startPoint.lng], {
-        icon: L.icon({
-          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41],
-        }),
-      })
-        .bindPopup('출발지')
-        .addTo(markerLayerGroup.current);
-    }
+      console.log('폴리라인 그리기 완료');
 
-    // 도착지 (빨간색)
-    if (endPoint) {
-      L.marker([endPoint.lat, endPoint.lng], {
-        icon: L.icon({
-          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41],
-        }),
-      })
-        .bindPopup('도착지')
-        .addTo(markerLayerGroup.current);
-    }
-  }, [startPoint, endPoint]);
-
-  // 현재 위치 표시
-  useEffect(() => {
-    if (!map.current) return;
-
-    if (currentLocation) {
-      if (userLocationMarker.current) {
-        userLocationMarker.current.remove();
+      // 지도 중심을 경로에 맞게 조정
+      try {
+        const bounds = new window.kakao.maps.LatLngBounds();
+        pathPoints.forEach((point) => {
+          bounds.extend(point);
+        });
+        mapRef.current.setBounds(bounds);
+        console.log('지도 중심 조정 완료');
+      } catch (error) {
+        console.warn('setBounds 처리 중 에러:', error);
       }
-
-      userLocationMarker.current = L.circleMarker([currentLocation.lat, currentLocation.lng], {
-        radius: 8,
-        fillColor: '#2196F3',
-        color: '#fff',
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 0.8,
-      })
-        .addTo(map.current)
-        .bindPopup('현재 위치');
-    } else if (userLocationMarker.current) {
-      userLocationMarker.current.remove();
-      userLocationMarker.current = null;
     }
-  }, [currentLocation]);
+  }, [isMapReady, routeCoordinates]);
 
-  // 안내 포인트 표시
+  // 출발지/도착지 마커 표시
   useEffect(() => {
-    if (!map.current || !markerLayerGroup.current || instructions.length === 0) {
-      return;
+    if (!isMapReady || !mapRef.current || !window.kakao || (!startPoint && !endPoint)) return;
+
+    console.log('출발/도착 마커 표시:', { startPoint, endPoint });
+
+    // 기존 시작/종료 마커 제거
+    markersRef.current
+      .filter((m) => m._userData?.type !== 'current' && m._userData?.type !== 'instruction')
+      .forEach((marker) => {
+        if (marker) marker.setMap(null);
+      });
+    markersRef.current = markersRef.current.filter(
+      (m) => m._userData?.type === 'current' || m._userData?.type === 'instruction'
+    );
+
+    // 출발지 마커
+    if (startPoint) {
+      const startMarkerImage = new window.kakao.maps.MarkerImage(
+        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/red_b.png',
+        new window.kakao.maps.Size(50, 45),
+        { offset: new window.kakao.maps.Point(15, 43) }
+      );
+
+      const startMarker = new window.kakao.maps.Marker({
+        position: new window.kakao.maps.LatLng(startPoint.lat, startPoint.lng),
+        image: startMarkerImage,
+      });
+      startMarker.setMap(mapRef.current);
+      startMarker._userData = { type: 'start' };
+      markersRef.current.push(startMarker);
+      console.log('출발지 마커 추가:', startPoint);
     }
 
-    instructions.forEach((instruction) => {
-      const { coordinates, text } = instruction;
-      if (coordinates) {
-        L.circleMarker([coordinates.lat, coordinates.lng], {
-          radius: 5,
-          fillColor: '#FFA500',
-          color: '#fff',
-          weight: 1,
-          opacity: 1,
-          fillOpacity: 0.7,
-        })
-          .bindPopup(text)
-          .addTo(markerLayerGroup.current);
+    // 도착지 마커
+    if (endPoint) {
+      const endMarkerImage = new window.kakao.maps.MarkerImage(
+        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/blue_b.png',
+        new window.kakao.maps.Size(50, 45),
+        { offset: new window.kakao.maps.Point(15, 43) }
+      );
+
+      const endMarker = new window.kakao.maps.Marker({
+        position: new window.kakao.maps.LatLng(endPoint.lat, endPoint.lng),
+        image: endMarkerImage,
+      });
+      endMarker.setMap(mapRef.current);
+      endMarker._userData = { type: 'end' };
+      markersRef.current.push(endMarker);
+      console.log('도착지 마커 추가:', endPoint);
+    }
+  }, [isMapReady, startPoint, endPoint]);
+
+  // 현재 위치 마커 표시
+  useEffect(() => {
+    if (!isMapReady || !mapRef.current || !window.kakao || !currentLocation) return;
+
+    console.log('현재 위치 마커 표시:', currentLocation);
+
+    // 기존 현재위치 마커 제거
+    const existingLocationMarker = markersRef.current.find((m) => m._userData?.type === 'current');
+    if (existingLocationMarker) {
+      existingLocationMarker.setMap(null);
+      markersRef.current = markersRef.current.filter((m) => m._userData?.type !== 'current');
+    }
+
+    // 현재 위치 마커 추가
+    const locationMarker = new window.kakao.maps.Marker({
+      position: new window.kakao.maps.LatLng(currentLocation.lat, currentLocation.lng),
+      image: new window.kakao.maps.MarkerImage(
+        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+        new window.kakao.maps.Size(24, 35)
+      ),
+    });
+    locationMarker.setMap(mapRef.current);
+    locationMarker._userData = { type: 'current' };
+    markersRef.current.push(locationMarker);
+  }, [isMapReady, currentLocation]);
+
+  // 안내 포인트 마커 표시
+  useEffect(() => {
+    if (!isMapReady || !mapRef.current || !window.kakao || instructions.length === 0) return;
+
+    console.log('안내 포인트 마커 표시:', instructions.length);
+
+    // 기존 안내 포인트 제거
+    const instructionMarkers = markersRef.current.filter((m) => m._userData?.type === 'instruction');
+    instructionMarkers.forEach((marker) => {
+      if (marker) marker.setMap(null);
+    });
+    markersRef.current = markersRef.current.filter((m) => m._userData?.type !== 'instruction');
+
+    // 각 안내 포인트 마커 추가
+    instructions.forEach((instruction, index) => {
+      if (instruction.coordinates) {
+        const instructionMarker = new window.kakao.maps.Marker({
+          position: new window.kakao.maps.LatLng(
+            instruction.coordinates.lat,
+            instruction.coordinates.lng
+          ),
+        });
+        instructionMarker.setMap(mapRef.current);
+        instructionMarker._userData = { type: 'instruction', index };
+        markersRef.current.push(instructionMarker);
       }
     });
-  }, [instructions]);
+  }, [isMapReady, instructions]);
 
-  return <div className={styles.mapContainer} ref={mapContainer} />;
+  return (
+    <div className={styles.mapContainer}>
+      <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
+    </div>
+  );
 };
 
 export default RouteMap;

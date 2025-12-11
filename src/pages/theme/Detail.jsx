@@ -12,7 +12,7 @@ import HeartDefault from "../../assets/Heart.svg";
 import HeartFilled from "../../assets/HeartFilled.png";
 
 import { pathsService } from "../../api/paths";
-import { tmapApi } from "../../api/tmap";
+import { kakaoApi } from "../../api/kakao";
 
 
 export default function Detail() {
@@ -32,11 +32,11 @@ export default function Detail() {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [mapLoading, setMapLoading] = useState(false);
 
-  // Tmap API를 통해 경로 정보 가져오기
+  // Kakao API를 통해 경로 정보 가져오기
   const fetchRoute = async (startX, startY, endX, endY, courseName) => {
     try {
       setMapLoading(true);
-      const response = await tmapApi.getPedestrianRoute({
+      const response = await kakaoApi.getPedestrianRoute({
         startX,
         startY,
         endX,
@@ -45,12 +45,17 @@ export default function Detail() {
         endName: courseName || '도착지',
       });
 
-      if (response.isSuccess && response.data.features) {
-        const parsedRoute = tmapApi.parseRouteResponse(response.data);
+      if (response.isSuccess && response.data) {
+        const parsedRoute = kakaoApi.parseRouteResponse(response.data);
         setRouteCoordinates(parsedRoute.coordinates);
+        console.log('경로 좌표 설정:', parsedRoute.coordinates);
+      } else {
+        console.warn('경로 데이터 없음:', response);
+        setRouteCoordinates([]);
       }
     } catch (error) {
       console.error('경로 정보 조회 실패:', error);
+      setRouteCoordinates([]);
     } finally {
       setMapLoading(false);
     }
@@ -233,7 +238,8 @@ export default function Detail() {
         </section>
 
         <p className="detail-route">
-          약 {detail.distance}km · {Math.ceil(detail.estimated_time / 60)}분
+          {detail.distance > 0 ? `약 ${detail.distance}km · ` : ''}
+          {Math.ceil(detail.estimated_time / 60)}분
         </p>
 
       </main>

@@ -20,26 +20,36 @@
     width: 100%;
     height: 240px;
     overflow: hidden;
-    background-color: rgba(8, 0, 38, 0.3); /* 어두운 느낌 */
-    backdrop-filter: blur(2px);           /* 배경 흐림 */  
+
   }
   
   .detail-top-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    
   }
+
+  /* 오버레이: 블러 + 어둡게적용 */
+  .detail-top-image-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 0, 38, 0.3); /* 어둡게 */
+    backdrop-filter: blur(2px);
+    z-index: 1; /* 이미지보단 위, 썸네일 아래 */
+}
   
   /* 썸네일 이미지 */
   .detail-thumb-image {
     width: 140px;
     height: 140px;
     object-fit: cover;
-    border-radius: 16px;
+    border-radius: 8px;
     position: absolute;
     bottom: 10px;
     left: 24px;
+    z-index: 2; /* 오버레이보다 위 */
+
   }
   
   /* 본문 정보 */
@@ -130,14 +140,17 @@
     padding: 24px;
     position: relative;
     margin-top: 8px;
+    z-index: 10;
   }
   
   .detail-map-placeholder {
     width: 100%;
     height: 300px;
-    border-radius: 16px;
+    border-radius: 8px;
     overflow: hidden;
     background-color: #f5f5f5;
+    position: relative;
+    z-index: 1;
   }
   
   /* 루트 */
@@ -146,7 +159,7 @@
     font-size: 14px;
     color: #444;
     padding: 0 24px 100px;
-    text-align: right;
+    text-align: left;
   }
   
   .route-dashed {
