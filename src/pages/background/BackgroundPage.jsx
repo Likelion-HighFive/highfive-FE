@@ -4,6 +4,8 @@ import styles from './BackgroundPage.module.css';
 import MenuBar from '../../components/common/MenuBar';
 import FloatingActionButtons from '../../components/common/FloatingActionButtons';
 import axios from 'axios';
+import { pathsService } from "../../api/paths";
+
 
 // 아이콘 및 이미지 임포트
 import areaLogo from '../../assets/images/logo/area_logo.svg';
@@ -29,40 +31,16 @@ const BackgroundPage = () => {
   // 카드의 좋아요 상태를 전환합니다
   const toggleLike = async (cardId) => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const tokenType = localStorage.getItem('tokenType') || 'Bearer';
-      
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}paths/${cardId}/like-toggle`,
-        {},
-        {
-          headers: {
-            'Authorization': `${tokenType} ${token}`,
-            'Content-Type': 'application/json',
-          }/*,
-          withCredentials: true*/
-        }
-      );
+      const result = await pathsService.toggleLike(cardId);
+      const { is_liked, likes_count } = result.data;
 
-      if (response.data.isSuccess) {
-        const { is_liked, likes_count } = response.data.data;
-        
-        // Update the specific card's like status and count
-        setPathCards(prevCards => 
-          prevCards.map(card => 
-            card.id === cardId 
-              ? { ...card, is_liked, likes_count }
-              : card
-          )
-        );
-      }
+      setPathCards((prev) =>
+        prev.map((card) =>
+          card.id === cardId ? { ...card, is_liked, likes_count } : card
+        )
+      );
     } catch (error) {
-      console.error('Error toggling like:', error);
-      // Optionally show an error message to the user
-      if (error.response?.status === 401) {
-        // Handle unauthorized error (e.g., redirect to login)
-        console.log('토큰이 만료되었거나 유효하지 않습니다. 다시 로그인해주세요.');
-      }
+      console.error("좋아요 토글 오류:", error);
     }
   };
 
@@ -112,40 +90,19 @@ const BackgroundPage = () => {
   const fetchPaths = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('accessToken');
-      const tokenType = localStorage.getItem('tokenType') || 'Bearer';
-      
-      console.log('Sending request to:', `${import.meta.env.VITE_API_BASE_URL}paths`);
-      console.log('With token:', `${tokenType} ${token?.substring(0, 20)}...`);
-      
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}paths`,
-        {
-          params: {
-            filter: selectedCategory,
-            sort: sortBy,
-            // user_location: '37.5665,126.9780' // 현재 위치가 있다면 추가
-          },
-          headers: {
-            'Authorization': `${tokenType} ${token}`,
-            'Content-Type': 'application/json',
-          }
-          // withCredentials: true 제거
-        }
-      );
-
-      console.log('Response:', response);
-      
-      if (response.data.isSuccess) {
-        setPathCards(response.data.data);
-      }
+      const data = await pathsService.getPaths({
+        filter: selectedCategory,
+        sort: sortBy
+      });
+      setPathCards(data);
     } catch (err) {
-      console.error('Error fetching paths:', err);
-      setError('산책 코스를 불러오는 중 오류가 발생했습니다.');
+      console.error("산책 코스 조회 오류:", err);
+      setError("산책 코스를 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
+
 
   // 카테고리나 정렬 기준이 변경될 때마다 데이터 다시 불러오기
   useEffect(() => {
