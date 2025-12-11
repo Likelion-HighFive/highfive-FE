@@ -1,6 +1,6 @@
 export const googleApi = {
   // Google Directions API로 보행자 경로 가져오기
-  getPedestrianRoute: async ({
+  getWalkingRoute: async ({
     startX,
     startY,
     endX,
