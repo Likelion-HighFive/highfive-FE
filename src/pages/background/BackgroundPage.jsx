@@ -224,7 +224,15 @@ const BackgroundPage = () => {
         <div className={styles.pathGrid}>
           {pathCards.length === 0 ? (
             <div className={styles.noResults}>
-              <p>표시할 산책 코스가 없습니다.</p>
+              <div className={styles.noResultsIcon}>🚶‍♂️</div>
+              <h3 className={styles.noResultsTitle}>아직 등록된 산책 코스가 없어요</h3>
+              <p className={styles.noResultsMessage}>첫 번째 산책 코스를 등록해보는 건 어떨까요?</p>
+              <button 
+                className={styles.addPathButton}
+                onClick={handleAddPath}
+              >
+                산책 코스 등록하기
+              </button>
             </div>
           ) : (
             pathCards.map(card => (
