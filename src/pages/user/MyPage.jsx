@@ -201,9 +201,6 @@ const MyPage = () => {
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>마이페이지</h1>
-          <button className={styles.editButton} onClick={handleEditProfile}>
-            회원정보수정
-          </button>
         </header>
 
         <section className={styles.profileSection}>
@@ -258,14 +255,6 @@ const MyPage = () => {
         </div>
 
         <div className={styles.menuContainer}>
-          <div className={`${styles.menuItem} ${styles.infoItem}`} onClick={navigateToMemberInfo}>
-            <div>
-              <h3 className={styles.menuTitle}>회원정보 변경</h3>
-              <p className={styles.menuDescription}>이름 생년월일 휴대폰번호 이메일</p>
-            </div>
-            <img src={RightArrowIcon} alt="" className={styles.arrowIcon} />
-          </div>
-
           <div className={`${styles.menuItem} ${styles.infoItem}`} onClick={navigateToCarbonInfo}>
             <div>
               <h3 className={styles.menuTitle}>나의 탄소정보</h3>
