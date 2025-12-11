@@ -107,6 +107,13 @@ const CreatePathPage = () => {
     setIsSubmitting(true);
     setError('');
 
+    // 필수 필드 검증
+    if (!formData.name || !formData.start_location || !formData.end_location || !formData.tags || formData.images.length === 0) {
+      setError('필수 항목을 모두 입력해주세요.');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const formDataToSend = new FormData();
       
@@ -114,31 +121,68 @@ const CreatePathPage = () => {
       formDataToSend.append('name', formData.name);
       formDataToSend.append('start_location', formData.start_location);
       formDataToSend.append('end_location', formData.end_location);
-      formDataToSend.append('introduction', formData.introduction);
-      formDataToSend.append('tags', formData.tags);
-      formDataToSend.append('representative_image_index', formData.representative_image_index);
+      formDataToSend.append('introduction', formData.introduction || '');
+      
+      // 태그 처리
+      const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+      formDataToSend.append('tags', JSON.stringify(tagsArray));
+      
+      // 대표 이미지 인덱스
+      formDataToSend.append('representative_image_index', formData.representative_image_index || 0);
       
       // 이미지 파일 추가
-      formData.images.forEach((image, index) => {
+      formData.images.forEach((image) => {
         formDataToSend.append('images', image);
       });
 
-      // 실제 API 엔드포인트로 교체 필요
-      const response = await fetch('/api/v1/paths', {
-        method: 'POST',
-        body: formDataToSend,
-        // Content-Type 헤더는 브라우저가 자동으로 경계값과 함께 설정하도록 함
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create path');
+      // 환경 변수 사용하여 API 호출
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        throw new Error('로그인이 필요합니다. 로그인 후 다시 시도해주세요.');
       }
 
-      const result = await response.json();
-      navigate(`/paths/${result.data.id}`);
+      // Ensure there's no double slash in the URL
+      const baseUrl = import.meta.env.VITE_API_BASE_URL.endsWith('/') 
+        ? import.meta.env.VITE_API_BASE_URL.slice(0, -1) 
+        : import.meta.env.VITE_API_BASE_URL;
+      
+      const response = await fetch(`${baseUrl}/paths`, {
+        method: 'POST',
+        body: formDataToSend,
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      let responseData;
+      try {
+        const text = await response.text();
+        responseData = text ? JSON.parse(text) : {};
+      } catch (e) {
+        console.error('응답 파싱 실패:', e);
+        throw new Error('서버 응답을 처리하는 중 오류가 발생했습니다.');
+      }
+
+      if (!response.ok) {
+        // 422 Validation Error 처리
+        if (response.status === 422 && responseData.detail) {
+          const validationErrors = responseData.detail
+            .map(error => `${error.loc[1] || error.loc[0]}: ${error.msg}`)
+            .join('\n');
+          throw new Error(`유효성 검사 오류:\n${validationErrors}`);
+        }
+        throw new Error(responseData.message || `산책로 등록에 실패했습니다. (${response.status})`);
+      }
+
+      // 성공 시 응답 처리
+      if (responseData.isSuccess && responseData.data) {
+        navigate(`/paths/${responseData.data.id}`);
+      } else {
+        throw new Error('서버에서 예상치 못한 응답을 받았습니다.');
+      }
     } catch (err) {
-      setError(err.message || 'An error occurred while creating the path');
+      setError(err.message || '산책로 등록 중 오류가 발생했습니다.');
       console.error('Error creating path:', err);
     } finally {
       setIsSubmitting(false);

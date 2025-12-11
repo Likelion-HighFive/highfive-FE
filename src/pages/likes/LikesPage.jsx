@@ -98,9 +98,9 @@ const LikesPage = () => {
     return mins > 0 ? `${hours}시간 ${mins}분` : `${hours}시간`;
   };
 
-  // Handle card click to navigate to path detail
+  // 카드 클릭 시 상세 페이지로 이동
   const handleCardClick = (pathId) => {
-    navigate(`/path/${pathId}`);
+    navigate(`/detail/${pathId}`);
   };
 
   // Fetch liked paths when component mounts

@@ -253,7 +253,12 @@ const BackgroundPage = () => {
             </div>
           ) : (
             pathCards.map(card => (
-              <div key={card.id} className={styles.pathCard}>
+              <div 
+                key={card.id} 
+                className={styles.pathCard}
+                onClick={() => navigate(`/detail/${card.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className={styles.imageContainer}>
                   <img 
                     src={card.representative_image || nightCityBg} 
