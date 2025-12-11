@@ -33,7 +33,7 @@ const LikesPage = () => {
       const tokenType = localStorage.getItem('tokenType') || 'Bearer';
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}paths/likes`,
+        `${import.meta.env.VITE_API_BASE_URL}/paths/likes`,
         {
           headers: {
             'Authorization': `${tokenType} ${token}`,
