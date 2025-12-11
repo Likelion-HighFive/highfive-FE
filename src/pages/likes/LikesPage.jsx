@@ -16,7 +16,7 @@ const LikesPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('likes');
-  const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [sortBy, setSortBy] = useState('recommended');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [paths, setPaths] = useState([]);
@@ -41,14 +41,42 @@ const LikesPage = () => {
       const token = localStorage.getItem('accessToken');
       const tokenType = localStorage.getItem('tokenType') || 'Bearer';
 
-      // Add category filter to the API request
+      // Prepare query parameters
       const params = new URLSearchParams();
-      if (selectedCategory !== 'ALL') {
-        params.append('category', selectedCategory);
+      
+      // Add filter parameter (category) - only if not 'ALL'
+      if (selectedCategory && selectedCategory !== 'ALL') {
+        const categoryMapping = {
+          '감성길': 'EMOTIONAL',
+          '씨티뷰길': 'CITY_VIEW',
+          '자연길': 'NATURE',
+          '야경길': 'NIGHT_VIEW',
+          '안전길': 'SAFE'
+        };
+        const apiCategory = categoryMapping[selectedCategory] || selectedCategory;
+        if (apiCategory !== 'ALL') {
+          params.append('filter', apiCategory);
+        }
+      }
+      
+      // Add sort parameter
+      if (sortBy) {
+        const sortMapping = {
+          'recommended': 'RECOMMENDED',
+          'latest': 'LATEST',
+          'likes': 'LIKES',
+          'distance': 'DISTANCE'
+        };
+        params.append('sort', sortMapping[sortBy] || 'LATEST');
+      }
+      
+      // Add search query if exists
+      if (searchQuery) {
+        params.append('search', searchQuery);
       }
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/paths/likes?${params.toString()}`,
+        `${import.meta.env.VITE_API_BASE_URL}/paths/liked?${params.toString()}`,
         {
           headers: {
             'Authorization': `${tokenType} ${token}`,
@@ -118,7 +146,7 @@ const LikesPage = () => {
     navigate(`/detail/${pathId}`);
   };
 
-  // 컴포넌트 마운트 시 또는 카테고리 변경 시 좋아요한 경로 가져오기
+  // 컴포넌트 마운트 시 또는 필터/정렬 변경 시 좋아요한 경로 가져오기
   useEffect(() => {
     fetchLikedPaths();
     
@@ -135,13 +163,12 @@ const LikesPage = () => {
     };
 
     fetchStepCount();
-  }, [selectedCategory]);
+  }, [selectedCategory, sortBy]); 
 
-  // 검색 핸들러
+  // 검색 핸들러 (엔터 또는 검색 버튼 클릭 시 실행)
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('검색어:', searchQuery);
-    // 여기에 검색 로직 추가
+    fetchLikedPaths(); // 검색 실행
   };
 
   // 플로팅 액션 버튼 핸들러
@@ -192,6 +219,11 @@ const LikesPage = () => {
                 placeholder="길 검색하기"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearch(e);
+                  }
+                }}
                 className={styles.searchInput}
               />
               <button type="submit" className={styles.searchButton}>
