@@ -132,6 +132,7 @@ const BackgroundPage = () => {
     return (
       <div className={styles.container}>
         <div className={styles.loading}>
+          <div className={styles.loadingSpinner}></div>
           <p>산책 코스를 불러오는 중입니다...</p>
         </div>
       </div>
