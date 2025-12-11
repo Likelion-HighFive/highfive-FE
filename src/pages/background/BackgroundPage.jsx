@@ -29,18 +29,36 @@ const BackgroundPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stepCount, setStepCount] = useState(0); // 걸음수 상태
+
+  const LIKED_STORAGE_KEY = "likedPaths";
+
+  const getLikedMap = () => {
+    try {
+      return JSON.parse(localStorage.getItem(LIKED_STORAGE_KEY)) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+
+  const saveLikedMap = (map) => {
+    localStorage.setItem(LIKED_STORAGE_KEY, JSON.stringify(map));
+  };
   
   // 카드의 좋아요 상태를 전환합니다
   const toggleLike = async (cardId) => {
     try {
       const result = await pathsService.toggleLike(cardId);
       const { is_liked, likes_count } = result.data;
-
+  
       setPathCards((prev) =>
         prev.map((card) =>
           card.id === cardId ? { ...card, is_liked, likes_count } : card
         )
       );
+  
+      const likedMap = getLikedMap();
+      likedMap[cardId] = is_liked;
+      saveLikedMap(likedMap);
     } catch (error) {
       console.error("좋아요 토글 오류:", error);
     }
@@ -96,9 +114,19 @@ const BackgroundPage = () => {
       setLoading(true);
       const data = await pathsService.getPaths({
         filter: selectedCategory,
-        sort: sortBy
+        sort: sortBy,
       });
-      setPathCards(data);
+  
+      // 내가 이전에 눌렀던 좋아요 상태 불러오기
+      const likedMap = getLikedMap();
+  
+      // 서버에서 온 데이터 + localStorage 의 is_liked 를 합침
+      const merged = data.map((card) => ({
+        ...card,
+        is_liked: likedMap[card.id] ?? card.is_liked ?? false,
+      }));
+  
+      setPathCards(merged);
     } catch (err) {
       console.error("산책 코스 조회 오류:", err);
       setError("산책 코스를 불러오는 중 오류가 발생했습니다.");
