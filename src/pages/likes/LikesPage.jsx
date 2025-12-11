@@ -1,168 +1,273 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import styles from './LikesPage.module.css';
 import MenuBar from '../../components/common/MenuBar';
 import FloatingActionButtons from '../../components/common/FloatingActionButtons';
 
 // 아이콘 및 이미지 임포트
 import searchIcon from '../../assets/icons/search.svg';
-import heartsIcon from '../../assets/icons/like_click_icon.svg';
-import heartIcon from '../../assets/icons/heart_icon.svg';
 import heartFilledIcon from '../../assets/icons/heart_filled_icon.svg';
 import commentIcon from '../../assets/icons/comment_icon.svg';
+import nightCityBg from '../../assets/product/night city background.svg';
 
 const LikesPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('likes');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('recommended'); // 'recommended', 'latest', 'popular'
+  const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [sortBy, setSortBy] = useState('recommended');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
-  // Mock data for paths with like status
-  const [paths, setPaths] = useState([
-    {
-      id: 1,
-      title: '매일매일 산책',
-      description: '한걸음이라도 여유있게',
-      tags: ['서울', '감성길', '자연길'],
-      likes: 124,
-      comments: 23,
-      image: 'path/to/image1.jpg',
-      isLiked: true  // Liked path - will show filled heart
-    },
-    {
-      id: 2,
-      title: '서울 야경 산책',
-      description: '밤에 걷기 좋은 길',
-      tags: ['서울', '야경길', '씨티뷰길'],
-      likes: 89,
-      comments: 15,
-      image: 'path/to/image2.jpg',
-      isLiked: false  // Not liked - will show empty heart
-    },
-    // Add more mock data as needed
-  ]);
+  const [paths, setPaths] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const toggleLike = (pathId) => {
-    setPaths(prevPaths => 
-      prevPaths.map(path => 
-        path.id === pathId 
-          ? { 
-              ...path, 
-              isLiked: !path.isLiked, 
-              likes: path.isLiked ? Math.max(0, path.likes - 1) : path.likes + 1 
-            } 
-          : path
-      )
-    );
-  };
+  // 카테고리 목록
+  const categories = ['전체', '감성길', '씨티뷰길', '자연길', '야경길'];
 
-  const handleTabChange = (tabName) => {
-    setActiveTab(tabName);
-    if (tabName === 'home') {
-      navigate('/home');
-    } else if (tabName === 'background') {
-      navigate('/background');
-    } else if (tabName === 'mypage') {
-      navigate('/mypage');
+  // Fetch liked paths from API
+  const fetchLikedPaths = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
+      const tokenType = localStorage.getItem('tokenType') || 'Bearer';
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}paths/likes`,
+        {
+          headers: {
+            'Authorization': `${tokenType} ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (response.data.isSuccess) {
+        setPaths(response.data.data || []);
+      } else {
+        setError(response.data.message || '데이터를 불러오는 데 실패했습니다.');
+      }
+    } catch (err) {
+      console.error('Error fetching liked paths:', err);
+      setError('좋아요한 산책 코스를 불러오는 중 오류가 발생했습니다.');
+      if (err.response?.status === 401) {
+        // Handle unauthorized
+        navigate('/login');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Toggle like status for a path
+  const toggleLike = async (pathId, e) => {
+    e.stopPropagation();
+    try {
+      const token = localStorage.getItem('accessToken');
+      const tokenType = localStorage.getItem('tokenType') || 'Bearer';
+      
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}paths/${pathId}/like-toggle`,
+        {},
+        {
+          headers: {
+            'Authorization': `${tokenType} ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      // Update the local state to remove the unliked path
+      setPaths(prevPaths => prevPaths.filter(path => path.id !== pathId));
+      
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      if (error.response?.status === 401) {
+        navigate('/login');
+      } else {
+        alert('좋아요 취소 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
+
+  // Format time in minutes to hours and minutes
+  const formatTime = (minutes) => {
+    if (minutes < 60) return `${minutes}분`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `${hours}시간 ${mins}분` : `${hours}시간`;
+  };
+
+  // 카드 클릭 시 상세 페이지로 이동
+  const handleCardClick = (pathId) => {
+    navigate(`/detail/${pathId}`);
+  };
+
+  // Fetch liked paths when component mounts
+  useEffect(() => {
+    fetchLikedPaths();
+  }, []);
+
+  // 검색 핸들러
   const handleSearch = (e) => {
     e.preventDefault();
     console.log('검색어:', searchQuery);
+    // 여기에 검색 로직 추가
   };
 
-  const categories = [
-    { id: 'all', name: '전체' },
-    { id: 'emotional', name: '감성길' },
-    { id: 'cityview', name: '씨티뷰길' },
-    { id: 'nature', name: '자연길' },
-    { id: 'nightview', name: '야경길' },
-  ];
+  // 카테고리 선택 핸들러
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    // 여기에 카테고리 필터링 로직 추가
+    console.log('선택된 카테고리:', category);
+  };
+
+  // 정렬 옵션 선택 핸들러
+  const handleSortSelect = (sortOption) => {
+    setSortBy(sortOption);
+    setIsDropdownOpen(false);
+    // 여기에 정렬 로직 추가
+    console.log('정렬 기준:', sortOption);
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loadingState}>
+          <div className={styles.loadingSpinner}></div>
+          <p>좋아요한 산책로를 불러오는 중입니다...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
-      {/* 검색 바 */}
-      <form onSubmit={handleSearch} className={styles.searchBar}>
-        <img src={searchIcon} alt="검색" className={styles.searchIcon} />
-        <input
-          type="text"
-          placeholder="길 검색하기"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className={styles.searchInput}
-        />
-      </form>
-
-      {/* 카테고리 필터 */}
-      <div className={styles.categoryContainer}>
-        {categories.map(category => (
-          <button
-            key={category.id}
-            className={`${styles.categoryButton} ${selectedCategory === category.id ? styles.activeCategory : ''}`}
-            onClick={() => setSelectedCategory(category.id)}
-          >
-            {category.name}
-          </button>
-        ))}
-      </div>
-
-      {/* 정렬 옵션 */}
-      <div className={styles.sortContainer}>
-        <div className={styles.sortDropdown} onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-          <span>추천순</span>
-          <span className={styles.dropdownArrow}>▼</span>
-          {isDropdownOpen && (
-            <div className={styles.dropdownMenu}>
-              <div onClick={() => setSortBy('recommended')}>추천순</div>
-              <div onClick={() => setSortBy('latest')}>최신순</div>
-              <div onClick={() => setSortBy('popular')}>인기순</div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 경로 목록 */}
-      <div className={styles.pathsGrid}>
-        {paths.map(path => (
-          <div key={path.id} className={styles.pathCard}>
-            <div className={styles.pathImage}>
-              {/* 이미지가 있다면 여기에 표시 */}
-              <div className={styles.pathImagePlaceholder}></div>
-              <button 
-                className={styles.likeButton}
-                onClick={() => toggleLike(path.id)}
-              >
-                <img 
-                  src={path.isLiked ? heartFilledIcon : heartIcon} 
-                  alt={path.isLiked ? '좋아요 취소' : '좋아요'} 
-                />
+      {/* Header */}
+      <header className={styles.header}>
+        <div className={styles.headerContent}>
+          <h1>좋아요한 산책로</h1>
+          <div className={styles.searchContainer}>
+            <form onSubmit={handleSearch} className={styles.searchForm}>
+              <input
+                type="text"
+                placeholder="길 검색하기"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+              />
+              <button type="submit" className={styles.searchButton}>
+                <img src={searchIcon} alt="검색" />
               </button>
-            </div>
-            <div className={styles.pathInfo}>
-              <h3>{path.title}</h3>
-              <p className={styles.pathDescription}>{path.description}</p>
-              <div className={styles.pathTags}>
-                {path.tags.map((tag, index) => (
-                  <span key={index} className={styles.tag}>{tag}</span>
-                ))}
-              </div>
-              <div className={styles.pathStats}>
-                <span><img src={heartsIcon} alt="좋아요" /> {path.likes}</span>
-                <span><img src={commentIcon} alt="댓글" /> {path.comments}</span>
-              </div>
-            </div>
+            </form>
           </div>
-        ))}
-      </div>
+        </div>
 
-      {/* 플로팅 액션 버튼 */}
+        {/* 카테고리 필터 */}
+        <div className={styles.categoryContainer}>
+          {categories.map((category) => (
+            <button
+              key={category}
+              className={`${styles.categoryButton} ${
+                selectedCategory === category ? styles.activeCategory : ''
+              }`}
+              onClick={() => handleCategorySelect(category)}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        {/* 정렬 옵션 */}
+        <div className={styles.sortContainer}>
+          <div 
+            className={styles.sortDropdown}
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          >
+            {sortBy === 'recommended' ? '추천순' : '최신순'}
+            <span className={styles.dropdownArrow}>▼</span>
+            {isDropdownOpen && (
+              <div className={styles.dropdownMenu}>
+                <div onClick={() => handleSortSelect('recommended')}>추천순</div>
+                <div onClick={() => handleSortSelect('latest')}>최신순</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className={styles.content}>
+        {error ? (
+          <div className={styles.errorState}>
+            <p>{error}</p>
+            <button 
+              className={styles.retryButton}
+              onClick={fetchLikedPaths}
+            >
+              다시 시도하기
+            </button>
+          </div>
+        ) : paths.length === 0 ? (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>❤️</div>
+            <h3>아직 좋아요한 산책로가 없어요</h3>
+            <p>마음에 드는 산책로에 좋아요를 눌러보세요!</p>
+          </div>
+        ) : (
+          <div className={styles.pathsGrid}>
+            {paths.map((path) => (
+              <div 
+                key={path.id} 
+                className={styles.pathCard}
+                onClick={() => handleCardClick(path.id)}
+              >
+                <div className={styles.pathImage}>
+                  <img 
+                    src={path.representative_image || nightCityBg} 
+                    alt={path.name}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = nightCityBg;
+                    }}
+                    className={styles.pathImage}
+                  />
+                  {path.tags && path.tags.length > 0 && (
+                    <div className={styles.tag}>
+                      {path.tags[0]}
+                    </div>
+                  )}
+                  <button 
+                    className={`${styles.likeButton} ${styles.liked}`}
+                    onClick={(e) => toggleLike(path.id, e)}
+                  >
+                    <img src={heartFilledIcon} alt="좋아요 취소" />
+                  </button>
+                </div>
+                <div className={styles.pathInfo}>
+                  <h3>{path.name}</h3>
+                  <div className={styles.metaInfo}>
+                    <span>{path.distance}km</span>
+                    <span>•</span>
+                    <span>{formatTime(Math.ceil(path.estimated_time / 60))}</span>
+                  </div>
+                  <div className={styles.likesCount}>
+                    <img src={heartFilledIcon} alt="좋아요" />
+                    <span>{path.likes_count || 0}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
+
+      {/* 플로팅 버튼 */}
       <FloatingActionButtons />
       
-      {/* 하단 메뉴 바 */}
-      <MenuBar activeTab={activeTab} onTabChange={handleTabChange} />
+      {/* Navigation */}
+      <MenuBar active="likes" />
     </div>
   );
 };

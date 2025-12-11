@@ -1,52 +1,81 @@
 .container {
-  max-width: 430px; /* 모바일 화면 너비 제한 */
+  max-width: 430px;
   margin: 0 auto;
-  padding: 16px;
-  padding-bottom: 80px; /* 메뉴바 공간 확보 */
-  background-color: #ffffff;
+  padding: 16px 16px 80px;
   min-height: 100vh;
   position: relative;
   width: 100%;
   box-sizing: border-box;
 }
 
-/* 검색 바 스타일 */
-.searchBar {
+/* Header */
+.header {
+  background-color: #fff;
+  padding: 16px;
+  margin: -16px -16px 16px -16px;
+}
+
+.headerContent {
+  margin-bottom: 12px;
+}
+
+.header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 16px 0;
+}
+
+/* Search Form */
+.searchContainer {
   position: relative;
-  margin: 0 0 24px 0;
-  width: 100%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.searchForm {
+  position: relative;
+  margin: 0;
 }
 
 .searchInput {
   width: 100%;
-  padding: 14px 48px 14px 20px;
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 400;
+  padding: 12px 16px;
+  padding-right: 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
   color: #333;
-  outline: none;
   background-color: white;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
 }
 
 .searchInput:focus {
   border-color: #8A2BE2;
-  box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.1);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
 }
 
-.searchIcon {
+.searchButton {
   position: absolute;
-  right: 16px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.searchButton:hover {
+  opacity: 1;
+}
+
+.searchButton img {
   width: 20px;
   height: 20px;
-  opacity: 0.6;
 }
 
 /* 카테고리 필터 스타일 */
@@ -128,20 +157,202 @@
   background-color: #f5f5f5;
 }
 
-/* 경로 카드 그리드 */
+/* Loading State */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  color: #666;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #8A2BE2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error State */
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+  padding: 20px;
+  color: #d32f2f;
+  background-color: #fdecea;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.errorState p {
+  margin: 0 0 16px 0;
+}
+
+.retryButton {
+  padding: 8px 16px;
+  background-color: #8A2BE2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.retryButton:active {
+  transform: scale(0.98);
+}
+
+.retryButton:hover {
+  background-color: #7B1FA2;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.emptyState h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.emptyState p {
+  font-size: 14px;
+  margin: 0;
+  color: #888;
+}
+
+/* 카테고리 필터 */
+.categoryContainer {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 8px 0 12px;
+  margin: 0 -16px 12px -16px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-left: 16px;
+}
+
+.categoryContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.categoryButton {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  background-color: #ffffff;
+  font-size: 13px;
+  color: #666666;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.activeCategory {
+  background-color: #8A2BE2;
+  color: white;
+  border-color: #8A2BE2;
+}
+
+/* 정렬 옵션 */
+.sortContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.sortDropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #666666;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.dropdownArrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+  margin-left: 2px;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-width: 100px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.dropdownMenu div {
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 13px;
+}
+
+.dropdownMenu div:hover {
+  background-color: #f5f5f5;
+}
+
+/* Path Grid */
 .pathsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 80px; /* 플로팅 버튼과의 간격 */
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .pathCard {
-  background: #ffffff;
+  background: #fff;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
 }
 
 .pathCard:active {
@@ -151,33 +362,84 @@
 .pathImage {
   position: relative;
   width: 100%;
-  padding-top: 100%;
-  background-color: #f0f0f0;
-  overflow: hidden;
+  height: 180px; /* Set a fixed height for the image container */
+  background-color: #f5f5f5;
 }
 
-.pathImagePlaceholder {
+.pathImage img {
+
+  object-fit: cover;
+  display: block;
+}
+
+.tag {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  top: 8px;
+  left: 8px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 500;
 }
 
 .likeButton {
   position: absolute;
   bottom: 8px;
   right: 8px;
+  width: 24px;
+  height: 24px;
+  background: transparent;
   border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 2;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.likeButton:hover {
+  transform: scale(1.1);
+}
+
+
+.pathInfo {
+  padding: 12px;
+}
+
+.pathInfo h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.likesCount {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #666;
+}
+
+.likesCount img {
+  width: 14px;
+  height: 14px;
+  opacity: 0.8;
 }
 
 

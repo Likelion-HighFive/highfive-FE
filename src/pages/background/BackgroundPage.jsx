@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './BackgroundPage.module.css';
 import MenuBar from '../../components/common/MenuBar';
 import FloatingActionButtons from '../../components/common/FloatingActionButtons';
+import axios from 'axios';
 
 // 아이콘 및 이미지 임포트
 import areaLogo from '../../assets/images/logo/area_logo.svg';
 import searchIcon from '../../assets/icons/search.svg';
 import heartIcon from '../../assets/icons/heart_icon.svg';
+import heartFilledIcon from '../../assets/icons/heart_filled_icon.svg';
 import commentIcon from '../../assets/icons/comment_icon.svg';
 import nightCityBg from '../../assets/product/night city background.svg';
 
@@ -17,16 +19,51 @@ const BackgroundPage = () => {
   const [activeTab, setActiveTab] = useState('background');
   const [likedCards, setLikedCards] = useState({});
   const location = useLocation();
-  const [selectedCategory, setSelectedCategory] = useState(location.state?.selectedCategory || 'all');
-  const [sortBy, setSortBy] = useState('latest'); // 'latest', 'popular', 'distance'
+  const [selectedCategory, setSelectedCategory] = useState(location.state?.selectedCategory || 'ALL');
+  const [sortBy, setSortBy] = useState('LATEST'); // 'LATEST', 'RECOMMENDED', 'LIKES', 'DISTANCE'
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [pathCards, setPathCards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   // 카드의 좋아요 상태를 전환합니다
-  const toggleLike = (cardId) => {
-    setLikedCards(prev => ({
-      ...prev,
-      [cardId]: !prev[cardId]
-    }));
+  const toggleLike = async (cardId) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const tokenType = localStorage.getItem('tokenType') || 'Bearer';
+      
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}paths/${cardId}/like-toggle`,
+        {},
+        {
+          headers: {
+            'Authorization': `${tokenType} ${token}`,
+            'Content-Type': 'application/json',
+          }/*,
+          withCredentials: true*/
+        }
+      );
+
+      if (response.data.isSuccess) {
+        const { is_liked, likes_count } = response.data.data;
+        
+        // Update the specific card's like status and count
+        setPathCards(prevCards => 
+          prevCards.map(card => 
+            card.id === cardId 
+              ? { ...card, is_liked, likes_count }
+              : card
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      // Optionally show an error message to the user
+      if (error.response?.status === 401) {
+        // Handle unauthorized error (e.g., redirect to login)
+        console.log('토큰이 만료되었거나 유효하지 않습니다. 다시 로그인해주세요.');
+      }
+    }
   };
 
   // 탭 변경 핸들러
@@ -55,83 +92,88 @@ const BackgroundPage = () => {
 
   // 카테고리 버튼 데이터
   const categories = [
-    { id: 'all', name: '전체' },
-    { id: 'emotional', name: '감성길' },
-    { id: 'cityview', name: '씨티뷰길' },
-    { id: 'nature', name: '자연길' },
-    { id: 'nightview', name: '야경길' },
-    { id: 'safe', name: '안전길' }
+    { id: 'ALL', name: '전체' },
+    { id: 'EMOTIONAL', name: '감성길' },
+    { id: 'CITY_VIEW', name: '씨티뷰길' },
+    { id: 'NATURE', name: '자연길' },
+    { id: 'NIGHT_VIEW', name: '야경길' },
+    { id: 'SAFE', name: '안전길' }
   ];
 
-  // 경로 카드 데이터
-  const pathCards = [
-    {
-      id: 1,
-      title: '야경이 아름다운 한강 산책로',
-      location: '서울특별시 용산구',
-      distance: '2.5km',
-      time: '35분',
-      likes: 128,
-      comments: 24,
-      image: nightCityBg,
-      category: '야경길'
-    },
-    {
-      id: 2,
-      title: '봄꽃 가득한 여의도 공원',
-      location: '서울특별시 영등포구',
-      distance: '3.2km',
-      time: '45분',
-      likes: 98,
-      comments: 15,
-      image: nightCityBg,
-      category: '자연길'
-    },
-    {
-      id: 3,
-      title: '낭만 가득한 남산타워 전망대',
-      location: '서울특별시 중구',
-      distance: '1.8km',
-      time: '25분',
-      likes: 156,
-      comments: 32,
-      image: nightCityBg,
-      category: '감성길'
-    },
-    {
-      id: 4,
-      title: '서울숲에서의 여유로운 오후',
-      location: '서울특별시 성동구',
-      distance: '4.1km',
-      time: '55분',
-      likes: 87,
-      comments: 12,
-      image: nightCityBg,
-      category: '자연길'
-    },
-    {
-      id: 5,
-      title: '경복궁 돌담길 산책',
-      location: '서울특별시 종로구',
-      distance: '2.0km',
-      time: '30분',
-      likes: 112,
-      comments: 28,
-      image: nightCityBg,
-      category: '역사길'
-    },
-    {
-      id: 6,
-      title: '한강공원 자전거 코스',
-      location: '서울특별시 서초구',
-      distance: '5.5km',
-      time: '40분',
-      likes: 134,
-      comments: 19,
-      image: nightCityBg,
-      category: '액티비티'
-    }
+  // 정렬 드롭다운
+  const sortOptions = [
+    { id: 'LATEST', name: '최신순' },
+    { id: 'RECOMMENDED', name: '추천순' },
+    { id: 'LIKES', name: '좋아요순' },
+    { id: 'DISTANCE', name: '거리순' }
   ];
+
+  // API에서 산책 코스 데이터 가져오기
+  const fetchPaths = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
+      const tokenType = localStorage.getItem('tokenType') || 'Bearer';
+      
+      console.log('Sending request to:', `${import.meta.env.VITE_API_BASE_URL}paths`);
+      console.log('With token:', `${tokenType} ${token?.substring(0, 20)}...`);
+      
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}paths`,
+        {
+          params: {
+            filter: selectedCategory,
+            sort: sortBy,
+            // user_location: '37.5665,126.9780' // 현재 위치가 있다면 추가
+          },
+          headers: {
+            'Authorization': `${tokenType} ${token}`,
+            'Content-Type': 'application/json',
+          }
+          // withCredentials: true 제거
+        }
+      );
+
+      console.log('Response:', response);
+      
+      if (response.data.isSuccess) {
+        setPathCards(response.data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching paths:', err);
+      setError('산책 코스를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 카테고리나 정렬 기준이 변경될 때마다 데이터 다시 불러오기
+  useEffect(() => {
+    fetchPaths();
+  }, [selectedCategory, sortBy]);
+
+  // 로딩 중인 경우
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>
+          <p>산책 코스를 불러오는 중입니다...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 에러가 발생한 경우
+  if (error) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.error}>
+          <p>{error}</p>
+          <button onClick={fetchPaths}>다시 시도하기</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -176,40 +218,26 @@ const BackgroundPage = () => {
             className={styles.sortButton}
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            {sortBy === 'latest' && '최신순'}
-            {sortBy === 'popular' && '추천순'}
-            {sortBy === 'distance' && '거리순'}
+            {sortBy === 'LATEST' && '최신순'}
+            {sortBy === 'RECOMMENDED' && '추천순'}
+            {sortBy === 'LIKES' && '좋아요순'}
+            {sortBy === 'DISTANCE' && '거리순'}
             <span className={`${styles.arrow} ${isDropdownOpen ? styles.arrowUp : ''}`}>▼</span>
           </button>
           {isDropdownOpen && (
             <div className={styles.dropdownMenu}>
-              <button 
-                className={`${styles.dropdownItem} ${sortBy === 'latest' ? styles.active : ''}`}
-                onClick={() => {
-                  setSortBy('latest');
-                  setIsDropdownOpen(false);
-                }}
-              >
-                최신순
-              </button>
-              <button 
-                className={`${styles.dropdownItem} ${sortBy === 'popular' ? styles.active : ''}`}
-                onClick={() => {
-                  setSortBy('popular');
-                  setIsDropdownOpen(false);
-                }}
-              >
-                추천순
-              </button>
-              <button 
-                className={`${styles.dropdownItem} ${sortBy === 'distance' ? styles.active : ''}`}
-                onClick={() => {
-                  setSortBy('distance');
-                  setIsDropdownOpen(false);
-                }}
-              >
-                거리순
-              </button>
+              {sortOptions.map(option => (
+                <button 
+                  key={option.id}
+                  className={`${styles.dropdownItem} ${sortBy === option.id ? styles.active : ''}`}
+                  onClick={() => {
+                    setSortBy(option.id);
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  {option.name}
+                </button>
+              ))}
             </div>
           )}
         </div>
@@ -217,39 +245,62 @@ const BackgroundPage = () => {
 
       {/* 메인 콘텐츠 */}
       <div className={styles.content}>
+        {/* 경로 카드 그리드 */}
         <div className={styles.pathGrid}>
-          {pathCards.map((card) => (
-            <div key={card.id} className={styles.pathCard}>
-              <div className={styles.imageContainer}>
-                <img 
-                  src={card.image} 
-                  alt={card.title}
-                  className={styles.cardImage}
-                />
-                <span className={styles.cardCategory}>{card.category}</span>
-                <div 
-                  className={`${styles.heartContainer} ${likedCards[card.id] ? styles.active : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleLike(card.id);
-                  }}
-                >
-                  <img 
-                    src={heartIcon} 
-                    alt="좋아요" 
-                    className={styles.heartIcon} 
-                  />
-                </div>
-              </div>
-              <div className={styles.cardContent}>
-                <h3 className={styles.cardTitle}>{card.title}</h3>
-                <p className={styles.cardLocation}>{card.location}</p>
-                <div className={styles.cardMeta}>
-                  <span className={styles.distanceTime}>{card.distance} · {card.time}</span>
-                </div>
-              </div>
+          {pathCards.length === 0 ? (
+            <div className={styles.noResults}>
+              <p>표시할 산책 코스가 없습니다.</p>
             </div>
-          ))}
+          ) : (
+            pathCards.map(card => (
+              <div 
+                key={card.id} 
+                className={styles.pathCard}
+                onClick={() => navigate(`/detail/${card.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className={styles.imageContainer}>
+                  <img 
+                    src={card.representative_image || nightCityBg} 
+                    alt={card.name} 
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = nightCityBg;
+                    }}
+                  />
+                  <div className={styles.cardCategory}>
+                    {card.tags && card.tags.length > 0 ? card.tags[0] : '산책로'}
+                  </div>
+                </div>
+                <div className={styles.cardContent}>
+                  <h3 className={styles.cardTitle}>{card.name}</h3>
+                  <p className={styles.cardLocation}>산책로</p>
+                  <div className={styles.cardMeta}>
+                    <span>{card.distance}km · {Math.ceil(card.estimated_time / 60)}분</span>
+                  </div>
+                  <div className={styles.cardActions}>
+                    <div 
+                      className={`${styles.likeButton} ${card.is_liked ? styles.liked : ''}`} 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleLike(card.id);
+                      }}
+                    >
+                      <img 
+                        src={card.is_liked ? heartFilledIcon : heartIcon} 
+                        alt={card.is_liked ? '좋아요 취소' : '좋아요'} 
+                      />
+                      <span>{card.likes_count}</span>
+                    </div>
+                    <button className={styles.actionButton}>
+                      <img src={commentIcon} alt="댓글" />
+                      0
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
