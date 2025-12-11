@@ -1,0 +1,152 @@
+import axios from 'axios';
+
+// Tmap API 기본 설정
+const tmapApiClient = axios.create({
+  baseURL: 'https://apis.openapi.sk.com',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+/**
+ * Tmap 도보 경로 찾기 API 호출
+ * @param {Object} params - API 요청 파라미터
+ * @param {number} params.startX - 출발지 경도 (WGS84)
+ * @param {number} params.startY - 출발지 위도 (WGS84)
+ * @param {number} params.endX - 도착지 경도 (WGS84)
+ * @param {number} params.endY - 도착지 위도 (WGS84)
+ * @param {string} [params.startName] - 출발지 이름
+ * @param {string} [params.endName] - 도착지 이름
+ * @returns {Promise<Object>} Tmap API 응답 (polyline, features 등)
+ */
+export const tmapApi = {
+  // 도보 경로 찾기
+  getPedestrianRoute: async ({
+    startX,
+    startY,
+    endX,
+    endY,
+    startName = '출발지',
+    endName = '도착지',
+  }) => {
+    try {
+      const response = await tmapApiClient.post(
+        '/tmap/routes/pedestrian',
+        {
+          startX,
+          startY,
+          endX,
+          endY,
+          startName,
+          endName,
+          // 추가 옵션
+          reqCoordType: 'WGS84Geo', // 요청 좌표 타입
+          resCoordType: 'WGS84Geo', // 응답 좌표 타입
+          ticketId: import.meta.env.VITE_TMAP_API_KEY,
+        }
+      );
+
+      if (response.data.features) {
+        return {
+          isSuccess: true,
+          data: response.data,
+        };
+      } else {
+        throw new Error('경로 데이터를 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('Tmap 도보 경로 API 오류:', error);
+      return {
+        isSuccess: false,
+        message: error.response?.data?.message || '경로 찾기에 실패했습니다.',
+        error,
+      };
+    }
+  },
+
+
+  decodePolyline: (polyline) => {
+    const points = [];
+    let index = 0,
+      lat = 0,
+      lng = 0;
+
+    while (index < polyline.length) {
+      let result = 0,
+        shift = 0;
+      let byte;
+
+      do {
+        byte = polyline.charCodeAt(index++) - 63;
+        result |= (byte & 0x1f) << shift;
+        shift += 5;
+      } while (byte >= 0x20);
+
+      const dlat = result & 1 ? ~(result >> 1) : result >> 1;
+      lat += dlat;
+
+      result = 0;
+      shift = 0;
+      do {
+        byte = polyline.charCodeAt(index++) - 63;
+        result |= (byte & 0x1f) << shift;
+        shift += 5;
+      } while (byte >= 0x20);
+
+      const dlng = result & 1 ? ~(result >> 1) : result >> 1;
+      lng += dlng;
+
+      points.push({
+        lat: lat / 1e5,
+        lng: lng / 1e5,
+      });
+    }
+
+    return points;
+  },
+
+
+  parseRouteResponse: (apiResponse) => {
+    const features = apiResponse.features || [];
+    const routeInfo = {
+      totalDistance: 0, // 미터 단위
+      totalTime: 0, // 초 단위
+      polyline: null,
+      instructions: [], // 안내 포인트 배열
+      coordinates: [], // 좌표 배열
+    };
+
+    features.forEach((feature) => {
+      if (feature.geometry.type === 'LineString') {
+        // 경로 정보
+        const coords = feature.geometry.coordinates;
+        routeInfo.coordinates = coords.map(([lng, lat]) => ({
+          lat,
+          lng,
+        }));
+        routeInfo.polyline = feature.properties.polyline;
+        routeInfo.totalDistance = feature.properties.distance || 0;
+        routeInfo.totalTime = feature.properties.time || 0;
+      } else if (feature.geometry.type === 'Point') {
+        // 경로 안내 포인트
+        const description = feature.properties.description || '';
+        if (description) {
+          routeInfo.instructions.push({
+            index: routeInfo.instructions.length,
+            text: description,
+            coordinates: {
+              lat: feature.geometry.coordinates[1],
+              lng: feature.geometry.coordinates[0],
+            },
+            distance: feature.properties.distance || 0,
+            time: feature.properties.time || 0,
+          });
+        }
+      }
+    });
+
+    return routeInfo;
+  },
+};
+
+export default tmapApi;
