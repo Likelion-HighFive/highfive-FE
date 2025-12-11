@@ -10,6 +10,7 @@ import LikeIcon from '../../assets/icons/like_icon.svg';
 import UserIcon from '../../assets/icons/my_icon.svg';
 import { userApi } from '../../api/api';
 import { toast } from 'react-toastify';
+import Modal from 'react-modal';
 
 const MyPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ const MyPage = () => {
     carbon_saved: 0
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newNickname, setNewNickname] = useState('');
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -65,8 +68,41 @@ const MyPage = () => {
   };
 
   const handleChangeName = () => {
-    // 이름 변경 페이지로 이동
-    navigate('/change-name');
+    setNewNickname(userData.nickname);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateNickname = async () => {
+    if (!newNickname.trim()) {
+      toast.error('닉네임을 입력해주세요.');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await userApi.updateNickname(newNickname);
+      
+      if (response.isSuccess) {
+        setUserData(prev => ({
+          ...prev,
+          nickname: response.data.nickname
+        }));
+        toast.success('닉네임이 성공적으로 변경되었습니다.');
+        setIsModalOpen(false);
+      } else {
+        toast.error(response.message || '닉네임 변경에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('닉네임 변경 중 오류 발생:', error);
+      toast.error(error.message || '닉네임 변경 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setNewNickname('');
   };
 
   const navigateToMemberInfo = () => {
@@ -140,6 +176,40 @@ const MyPage = () => {
           </div>
         </div>
       </div>
+
+      {/* 닉네임 변경 모달 */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        className={styles.modalContent}
+        overlayClassName={styles.modalOverlay}
+        contentLabel="닉네임 변경"
+        ariaHideApp={false}
+      >
+        <h2 className={styles.modalTitle}>닉네임 변경</h2>
+        <input
+          type="text"
+          value={newNickname}
+          onChange={(e) => setNewNickname(e.target.value)}
+          placeholder="새로운 닉네임을 입력하세요"
+          className={styles.modalInput}
+        />
+        <div className={styles.modalButtonGroup}>
+          <button 
+            onClick={closeModal}
+            className={styles.modalButton}
+          >
+            취소
+          </button>
+          <button 
+            onClick={handleUpdateNickname}
+            disabled={isLoading}
+            className={`${styles.modalButton} ${styles.primary}`}
+          >
+            {isLoading ? '변경 중...' : '변경하기'}
+          </button>
+        </div>
+      </Modal>
 
       {/* 공통 메뉴 바 */}
       <MenuBar />
