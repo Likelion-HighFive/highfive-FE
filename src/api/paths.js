@@ -60,7 +60,6 @@ export const pathsService = {
             "Content-Type": "application/json",
             // Authorization 필요하면 apiClient에서 자동 처리 가능
           },
-          withCredentials: true,
         }
       );
       return res.data;

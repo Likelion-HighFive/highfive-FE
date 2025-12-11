@@ -4,15 +4,30 @@ import styles from './FloatingActionButtons.module.css';
 import plusButton from '../../assets/icons/plus_button.svg';
 import walkButton from '../../assets/icons/walk_button.svg';
 
-const FloatingActionButtons = ({ stepCount = 0, isHome = false }) => {
+const FloatingActionButtons = ({ 
+  stepCount = 0, 
+  isHome = false, 
+  onAddPath, 
+  onShowSteps 
+}) => {
   const navigate = useNavigate();
   
-  const handleShowSteps = () => {
-    navigate('/footprint');
+  const handleShowSteps = (e) => {
+    e.preventDefault();
+    if (onShowSteps) {
+      onShowSteps();
+    } else {
+      navigate('/footprint');
+    }
   };
 
-  const handleAddPath = () => {
-    navigate('/create-path');
+  const handleAddPath = (e) => {
+    e.preventDefault();
+    if (onAddPath) {
+      onAddPath();
+    } else {
+      navigate('/create-path');
+    }
   };
 
   return (

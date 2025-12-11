@@ -4,6 +4,7 @@ import axios from 'axios';
 import styles from './LikesPage.module.css';
 import MenuBar from '../../components/common/MenuBar';
 import FloatingActionButtons from '../../components/common/FloatingActionButtons';
+import { walkingService } from '../../api/walking';
 
 // 아이콘 및 이미지 임포트
 import searchIcon from '../../assets/icons/search.svg';
@@ -21,19 +22,33 @@ const LikesPage = () => {
   const [paths, setPaths] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [stepCount, setStepCount] = useState(0); // 걸음수 상태 추가
 
   // 카테고리 목록
-  const categories = ['전체', '감성길', '씨티뷰길', '자연길', '야경길'];
+  const categories = [
+    { id: 'ALL', name: '전체' },
+    { id: 'EMOTIONAL', name: '감성길' },
+    { id: 'CITY_VIEW', name: '씨티뷰길' },
+    { id: 'NATURE', name: '자연길' },
+    { id: 'NIGHT_VIEW', name: '야경길' },
+    { id: 'SAFE', name: '안전길' }
+  ];
 
-  // Fetch liked paths from API
+  // 카테고리 필터와 함께 좋아요한 경로를 API에서 가져오기
   const fetchLikedPaths = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
       const tokenType = localStorage.getItem('tokenType') || 'Bearer';
 
+      // Add category filter to the API request
+      const params = new URLSearchParams();
+      if (selectedCategory !== 'ALL') {
+        params.append('category', selectedCategory);
+      }
+
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}paths/likes`,
+        `${import.meta.env.VITE_API_BASE_URL}/paths/likes?${params.toString()}`,
         {
           headers: {
             'Authorization': `${tokenType} ${token}`,
@@ -59,7 +74,7 @@ const LikesPage = () => {
     }
   };
 
-  // Toggle like status for a path
+  // 경로의 좋아요 상태 토글
   const toggleLike = async (pathId, e) => {
     e.stopPropagation();
     try {
@@ -90,7 +105,7 @@ const LikesPage = () => {
     }
   };
 
-  // Format time in minutes to hours and minutes
+  // 분 단위 시간을 시간과 분으로 포맷팅
   const formatTime = (minutes) => {
     if (minutes < 60) return `${minutes}분`;
     const hours = Math.floor(minutes / 60);
@@ -103,10 +118,24 @@ const LikesPage = () => {
     navigate(`/detail/${pathId}`);
   };
 
-  // Fetch liked paths when component mounts
+  // 컴포넌트 마운트 시 또는 카테고리 변경 시 좋아요한 경로 가져오기
   useEffect(() => {
     fetchLikedPaths();
-  }, []);
+    
+    // Fetch step count
+    const fetchStepCount = async () => {
+      try {
+        const response = await walkingService.getWalkingSummary();
+        if (response.isSuccess && response.data) {
+          setStepCount(response.data.total_steps || 0);
+        }
+      } catch (error) {
+        console.error('걸음수 조회 중 오류:', error);
+      }
+    };
+
+    fetchStepCount();
+  }, [selectedCategory]);
 
   // 검색 핸들러
   const handleSearch = (e) => {
@@ -115,11 +144,19 @@ const LikesPage = () => {
     // 여기에 검색 로직 추가
   };
 
+  // 플로팅 액션 버튼 핸들러
+  const handleAddPath = () => {
+    navigate('/create-path');
+  };
+
+  const handleShowSteps = () => {
+    navigate('/footprint');
+  };
+
   // 카테고리 선택 핸들러
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category);
-    // 여기에 카테고리 필터링 로직 추가
-    console.log('선택된 카테고리:', category);
+  const handleCategorySelect = (categoryId) => {
+    setSelectedCategory(categoryId);
+    // useEffect가 새 카테고리로 다시 가져오기를 트리거함
   };
 
   // 정렬 옵션 선택 핸들러
@@ -130,7 +167,7 @@ const LikesPage = () => {
     console.log('정렬 기준:', sortOption);
   };
 
-  // Loading state
+  // 로딩 상태
   if (loading) {
     return (
       <div className={styles.container}>
@@ -168,13 +205,13 @@ const LikesPage = () => {
         <div className={styles.categoryContainer}>
           {categories.map((category) => (
             <button
-              key={category}
+              key={category.id}
               className={`${styles.categoryButton} ${
-                selectedCategory === category ? styles.activeCategory : ''
+                selectedCategory === category.id ? styles.activeCategory : ''
               }`}
-              onClick={() => handleCategorySelect(category)}
+              onClick={() => handleCategorySelect(category.id)}
             >
-              {category}
+              {category.name}
             </button>
           ))}
         </div>
@@ -264,7 +301,12 @@ const LikesPage = () => {
       </main>
 
       {/* 플로팅 버튼 */}
-      <FloatingActionButtons />
+      <FloatingActionButtons 
+        onAddPath={handleAddPath}
+        onShowSteps={handleShowSteps}
+        stepCount={stepCount}
+        isHome={false}
+      />
       
       {/* Navigation */}
       <MenuBar active="likes" />
