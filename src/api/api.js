@@ -49,6 +49,13 @@ export const userApi = {
   // 사용자 프로필 조회
   getProfile: () => fetchWithAuth('/mypage/profile'),
   
+  // 닉네임 업데이트
+  updateNickname: (nickname) => 
+    fetchWithAuth('/mypage/nickname', {
+      method: 'PATCH',
+      body: JSON.stringify({ nickname })
+    }),
+  
   // 여기에 다른 사용자 관련 API를 추가할 수 있음.
 };
 
